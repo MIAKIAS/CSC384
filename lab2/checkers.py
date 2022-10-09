@@ -4,15 +4,18 @@
     Student#: 1004421262
 '''
 
+from cmath import inf
 from inspect import getargvalues
 import string
 import copy
 from sys import argv
 
+depth_limit = 13
+
 # Compute the ultility value of the state
 def utility(state:list) -> int:
     score = 0
-    for row in list:
+    for row in state:
         for item in row:
             if item == 'r':
                 score += 1
@@ -54,7 +57,7 @@ def jump_finder(state:list, tile:string, i:int, j:int, successors:list, firstCal
             jump_finder(temp_state, tile, i-2, j+2, successors, False)
         if (tile == 'R'):
             # RED KING can jump to down-left
-            if (i+1 < 8 and j-1 >= 0 and (state[i+1][j-1] == 'b' or state[i+1][j-1] == 'B') and i+2 >= 0 and j-2 >= 0 and state[i+2][j-2] == '.'):
+            if (i+1 < 8 and j-1 >= 0 and (state[i+1][j-1] == 'b' or state[i+1][j-1] == 'B') and i+2 < 8 and j-2 >= 0 and state[i+2][j-2] == '.'):
                 isJump = True
                 temp_state = copy.deepcopy(state)
                 temp_state[i][j] = '.'
@@ -73,7 +76,7 @@ def jump_finder(state:list, tile:string, i:int, j:int, successors:list, firstCal
                 jump_finder(temp_state, tile, i+2, j+2, successors, False)
     else:
         # Black can jump to down-left
-        if (i+1 < 8 and j-1 >= 0 and (state[i+1][j-1] == 'r' or state[i+1][j-1] == 'R') and i+2 >= 0 and j-2 >= 0 and state[i+2][j-2] == '.'):
+        if (i+1 < 8 and j-1 >= 0 and (state[i+1][j-1] == 'r' or state[i+1][j-1] == 'R') and i+2 < 8 and j-2 >= 0 and state[i+2][j-2] == '.'):
             isJump = True
             temp_state = copy.deepcopy(state)
             temp_state[i][j] = '.'
@@ -82,7 +85,7 @@ def jump_finder(state:list, tile:string, i:int, j:int, successors:list, firstCal
             # Upgrade to a king
             if (i+2 == 7):
                 tile = 'B'
-            print("(%d;%d) jump to down-left" %(i,j))
+            #print("(%d;%d) jump to down-left" %(i,j))
             jump_finder(temp_state, tile, i+2, j-2, successors, False)
         # Black can jump to down-right
         if (i+1 < 8 and j+1 < 8 and (state[i+1][j+1] == 'r' or state[i+1][j+1] == 'R') and i+2 < 8 and j+2 < 8 and state[i+2][j+2] == '.'):
@@ -94,7 +97,7 @@ def jump_finder(state:list, tile:string, i:int, j:int, successors:list, firstCal
             # Upgrade to a king
             if (i+2 == 7):
                 tile = 'B'
-            print("jump to down-right")
+            #print("jump to down-right")
             jump_finder(temp_state, tile, i+2, j+2, successors, False)
         if (tile == 'B'):
             # BLACK KING can jump to up-left
@@ -104,7 +107,7 @@ def jump_finder(state:list, tile:string, i:int, j:int, successors:list, firstCal
                 temp_state[i][j] = '.'
                 temp_state[i-1][j-1] = '.'
                 temp_state[i-2][j-2] = tile
-                print("jump to up-left")
+                #print("jump to up-left")
                 jump_finder(temp_state, tile, i-2, j-2, successors, False)
             # BLACK KING can jump to up-right
             if (i-1 >= 0 and j+1 < 8 and (state[i-1][j+1] == 'r' or state[i-1][j+1] == 'R') and i-2 >= 0 and j+2 < 8 and state[i-2][j+2] == '.'):
@@ -113,7 +116,7 @@ def jump_finder(state:list, tile:string, i:int, j:int, successors:list, firstCal
                 temp_state[i][j] = '.'
                 temp_state[i-1][j+1] = '.'
                 temp_state[i-2][j+2] = tile
-                print("jump to up-right")
+                #print("jump to up-right")
                 jump_finder(temp_state, tile, i-2, j+2, successors, False)
     if (not isJump and not firstCall):
         successors.append(state)
@@ -209,6 +212,45 @@ def successors(state:list, isRed:bool) -> list:
                     successors.append(new_state)
     return successors
 
+# Alpha-Beta Pruning Implementation
+def AlphaBeta(state:list, isRed:bool, alpha:int, beta:int, depth:int) -> tuple[list, int]:
+    global depth_limit
+    best_move = None
+    # Check whether we reach the depth limit
+    if (depth == depth_limit):
+        return best_move, utility(state)
+    potential_position = successors(state, isRed)
+    # Check whether it is a terminal state
+    if (len(potential_position) == 0):
+        return best_move, utility(state)
+
+    # Initial value
+    value = int()
+    if (isRed):
+        value = -inf
+    else:
+        value = inf
+    
+    # Recurcively iterate nodes as in DFS
+    for next_position in potential_position:
+        # Switch to opponent and increment depth
+        __, next_value = AlphaBeta(next_position, not isRed, alpha, beta, depth+1)
+        # Red == Ourselves == MAX
+        if (isRed):
+            if (value < next_value):
+                value, best_move = next_value, next_position
+            if (value >= beta):
+                return best_move, value
+            alpha = max(alpha, value)
+        else:
+            if (value > next_value):
+                value, best_move = next_value, next_position
+            if (value <= alpha):
+                return best_move, value
+            beta = min(beta, value)
+
+    # Return the best move and value of root
+    return best_move, value
 
 if __name__== "__main__":
     if len(argv) != 3:
@@ -229,9 +271,8 @@ if __name__== "__main__":
             print(i)
         print('==========================================')
 
-        ans = successors(initial_state, True)
-        print("%d moves"%len(ans))
-        for i in ans[1]:
+        next_move, __ = AlphaBeta(initial_state, False, -inf, inf, 0)
+        for i in next_move:
             print(i)
 
         
