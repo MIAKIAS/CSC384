@@ -5,7 +5,7 @@
 '''
 
 from cmath import inf
-from inspect import getargvalues
+from queue import PriorityQueue
 import string
 import copy
 from sys import argv
@@ -28,7 +28,7 @@ def utility(state:list) -> int:
     return score
 
 # Deal with multiple jumps
-def jump_finder(state:list, tile:string, i:int, j:int, successors:list, firstCall:bool) -> None:
+def jump_finder(state:list, tile:string, i:int, j:int, successors:PriorityQueue, firstCall:bool) -> None:
     isJump = False
     if (tile == 'r' or tile == 'R'):
         # Red can jump to up-left
@@ -119,13 +119,18 @@ def jump_finder(state:list, tile:string, i:int, j:int, successors:list, firstCal
                 #print("jump to up-right")
                 jump_finder(temp_state, tile, i-2, j+2, successors, False)
     if (not isJump and not firstCall):
-        successors.append(state)
+        if (tile == 'r' or tile == 'R'):
+            successors.put((-1 * utility(state), successors.qsize(), state))
+        else:
+            successors.put((utility(state), successors.qsize(), state))
         return
     return
 
 # Find all possible successors
-def successors(state:list, isRed:bool) -> list:
-    successors = []
+def successors(state:list, isRed:bool) -> PriorityQueue:
+    successors = PriorityQueue()
+    # Change to inscending or descending depends on player
+    priority_parameter = -1 if isRed else 1
     
     # First check if the player can jump
     for i in range(8):
@@ -135,7 +140,7 @@ def successors(state:list, isRed:bool) -> list:
                 continue
             jump_finder(state, state[i][j], i, j, successors, True)
     # Return if the player can jump
-    if (len(successors) != 0):
+    if (successors.qsize() != 0):
         return successors
 
     # Seek for single move
@@ -154,7 +159,7 @@ def successors(state:list, isRed:bool) -> list:
                         new_state[i-1][j-1] = 'R'
                     else:
                         new_state[i-1][j-1] = state[i][j]
-                    successors.append(new_state)
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                 # Red can move up-right
                 if (i-1 >= 0 and j+1 < 8 and state[i-1][j+1] == '.'):
                     new_state = copy.deepcopy(state)
@@ -164,19 +169,19 @@ def successors(state:list, isRed:bool) -> list:
                         new_state[i-1][j+1] = 'R'
                     else:
                         new_state[i-1][j+1] = state[i][j]
-                    successors.append(new_state)
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                 # RED KING can move down-left
                 if (state[i][j] == 'R' and i+1 < 8 and j-1 >= 0 and state[i+1][j-1] == '.'):
                     new_state = copy.deepcopy(state)
                     new_state[i][j] = '.'
                     new_state[i+1][j-1] = state[i][j]
-                    successors.append(new_state)
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                 # RED KING can move down-right
                 if (state[i][j] == 'R' and i+1 < 8 and j+1 < 8 and state[i+1][j+1] == '.'):
                     new_state = copy.deepcopy(state)
                     new_state[i][j] = '.'
                     new_state[i+1][j+1] = state[i][j]
-                    successors.append(new_state)
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
             else:
                 # Black can move down-left
                 if (i+1 < 8 and j-1 >= 0 and state[i+1][j-1] == '.'):
@@ -187,7 +192,7 @@ def successors(state:list, isRed:bool) -> list:
                         new_state[i+1][j-1] = 'B'
                     else:
                         new_state[i+1][j-1] = state[i][j]
-                    successors.append(new_state)
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                 # Black can move down-right
                 if (i+1 < 8 and j+1 < 8 and state[i+1][j+1] == '.'):
                     new_state = copy.deepcopy(state)
@@ -197,19 +202,19 @@ def successors(state:list, isRed:bool) -> list:
                         new_state[i+1][j+1] = 'B'
                     else:
                         new_state[i+1][j+1] = state[i][j]
-                    successors.append(new_state)
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                 # BLACK KING can move up-left
                 if (state[i][j] == 'B' and i-1 >= 0 and j-1 >= 0 and state[i-1][j-1] == '.'):
                     new_state = copy.deepcopy(state)
                     new_state[i][j] = '.'
                     new_state[i-1][j-1] = state[i][j]
-                    successors.append(new_state)
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                 # BLACK KING can move up-right
                 if (state[i][j] == 'B' and i-1 >= 0 and j+1 < 8 and state[i-1][j+1] == '.'):
                     new_state = copy.deepcopy(state)
                     new_state[i][j] = '.'
                     new_state[i-1][j+1] = state[i][j]
-                    successors.append(new_state)
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
     return successors
 
 # Alpha-Beta Pruning Implementation
@@ -220,8 +225,9 @@ def AlphaBeta(state:list, isRed:bool, alpha:int, beta:int, depth:int) -> tuple[l
     if (depth == depth_limit):
         return best_move, utility(state)
     potential_position = successors(state, isRed)
+
     # Check whether it is a terminal state
-    if (len(potential_position) == 0):
+    if (potential_position.qsize() == 0):
         return best_move, utility(state)
 
     # Initial value
@@ -232,7 +238,8 @@ def AlphaBeta(state:list, isRed:bool, alpha:int, beta:int, depth:int) -> tuple[l
         value = inf
     
     # Recurcively iterate nodes as in DFS
-    for next_position in potential_position:
+    while not potential_position.empty():
+        next_position = potential_position.get()[2]
         # Switch to opponent and increment depth
         __, next_value = AlphaBeta(next_position, not isRed, alpha, beta, depth+1)
         # Red == Ourselves == MAX
