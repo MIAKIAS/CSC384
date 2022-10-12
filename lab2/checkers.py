@@ -8,6 +8,7 @@
 FIXME: 1. Timer
        2. Cache
        3. Heuristic
+       old:50.867
 '''
 
 from cmath import inf
@@ -15,8 +16,11 @@ from queue import PriorityQueue
 import string
 import copy
 from sys import argv
+from turtle import goto
 
+# Global Variables
 depth_limit = 12
+state_cache = {}
 
 # Compute the ultility value of the state
 def utility(state:list) -> int:
@@ -32,6 +36,20 @@ def utility(state:list) -> int:
             elif item == 'B':
                 score -= 2
     return score
+
+# Check if the game has ended
+def is_game_end(state:list) -> bool:
+    isRed = False
+    isBlack = False
+    for row in state:
+        if isRed and isBlack:
+            return False
+        for item in row:
+            if item == 'r' or item == 'R':
+                isRed = True
+            elif item == 'b' or item == 'B':
+                isBlack = True
+    return not (isRed and isBlack)
 
 # Deal with multiple jumps
 def jump_finder(state:list, tile:string, i:int, j:int, successors:PriorityQueue, firstCall:bool) -> None:
@@ -227,8 +245,8 @@ def successors(state:list, isRed:bool) -> PriorityQueue:
 def AlphaBeta(state:list, isRed:bool, alpha:int, beta:int, depth:int) -> tuple[list, int]:
     global depth_limit
     best_move = None
-    # Check whether we reach the depth limit
-    if (depth == depth_limit):
+    # Check whether we reach the depth limit or the game has ended
+    if (depth == depth_limit or is_game_end(state)):
         return best_move, utility(state)
     potential_position = successors(state, isRed)
 
@@ -246,6 +264,20 @@ def AlphaBeta(state:list, isRed:bool, alpha:int, beta:int, depth:int) -> tuple[l
     # Recurcively iterate nodes as in DFS
     while not potential_position.empty():
         next_position = potential_position.get()[2]
+        '''=================================Cache Check======================================'''
+        # next_value = int()
+        # # Convert the state into string format used in cache
+        # next_position_string = ''.join(''.join(row) for row in next_position) + 'R' if isRed else 'B'
+        # __, next_value = AlphaBeta(next_position, not isRed, alpha, beta, depth+1)
+        # # Check if the state is in cache
+        # if next_position_string in state_cache:
+        #     next_value = state_cache[next_position_string]
+        # else:
+        #     # Switch to opponent and increment depth
+        #     # __, next_value = AlphaBeta(next_position, not isRed, alpha, beta, depth+1)
+        #     # Add to cache
+        #     state_cache[next_position_string] = next_value
+        '''=================================================================================='''
         # Switch to opponent and increment depth
         __, next_value = AlphaBeta(next_position, not isRed, alpha, beta, depth+1)
         # Red == Ourselves == MAX
@@ -283,9 +315,12 @@ if __name__== "__main__":
     print('=================='+ input_file + '=================')
     for i in initial_state:
         print(i)
-    
+
     print('==========================================')
     next_move, __ = AlphaBeta(initial_state, True, -inf, inf, 0)
+    if (next_move == None):
+        print("Game already ended")
+        next_move = initial_state
     for i in next_move:
         print(i)
 
