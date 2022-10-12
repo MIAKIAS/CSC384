@@ -8,7 +8,7 @@
 FIXME: 
        2. Cache: Finished, but need to tune if comparing depth
        3. Heuristic
-       15 level, 128sec
+       15 level, 64.02sec
 '''
 
 from cmath import inf
@@ -36,7 +36,7 @@ state_cache = {}
 #                 score -= 2
 #     return score
 
-# Compute my own ultility value of the state using researched heuristic function
+# Compute my own heuristic value of the state using researched heuristic function
 def utility(state:list) -> int:
     # Number of corresponding tiles
     num_pawns = 0
@@ -50,6 +50,15 @@ def utility(state:list) -> int:
     # Number of tiles that can jump
     num_jump_pawns = 0
     num_jump_kings = 0
+    # Aggregated distance of the pawns to promotion line
+    agg_distance = 0
+    # Number of unoccupied fields on promotion line
+    unoccupied_promotion_field = 0
+
+    
+    for item in state[0]:
+        if item == '.':
+            unoccupied_promotion_field += 1
 
     for row in range(len(state)):
         for col in range(len(state[row])):
@@ -65,6 +74,11 @@ def utility(state:list) -> int:
                 if (row-2 >= 0 and col-2 >= 0 and (state[row-1][col-1] == 'b' or state[row-1][col-1] == 'B') and state[row-2][col-2] == '.') \
                 or (row-2 >= 0 and col+2 <  8 and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B') and state[row-2][col+2] == '.'):
                     num_jump_pawns += 1
+
+                if (row <= 3):
+                    agg_distance -= row
+                else:
+                    agg_distance -= 7 - row
 
                 num_pawns += 1
             elif state[row][col] == 'R':
@@ -93,6 +107,11 @@ def utility(state:list) -> int:
                 or (row+2 <  8 and col+2 <  8 and (state[row+1][col+1] == 'r' or state[row+1][col+1] == 'R') and state[row+2][col+2] == '.'):
                     num_jump_pawns -= 1
 
+                if (row <= 3):
+                    agg_distance += row
+                else:
+                    agg_distance += 7 - row
+
                 num_pawns -= 1
             else: # state[row][col] == 'B'
                 if row == 0 or row == 7 or col == 0 or col == 7:
@@ -109,7 +128,7 @@ def utility(state:list) -> int:
                     num_jump_kings -= 1
 
                 num_kings -= 1
-    return num_pawns + 2*num_kings + num_safe_pawns + num_move_pawns + 2*num_safe_kings + 2*num_move_kings + 2*num_jump_pawns + 4*num_safe_kings
+    return num_pawns + 2*num_kings + num_safe_pawns + num_move_pawns + 2*num_safe_kings + 2*num_move_kings + 2*num_jump_pawns + 4*num_safe_kings + agg_distance
 
 # Check if the game has ended
 def is_game_end(state:list) -> bool:
