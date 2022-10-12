@@ -6,9 +6,9 @@
 
 '''
 FIXME: 1. Timer
-       2. Cache
+       2. Cache: Finished, but need to tune if comparing depth
        3. Heuristic
-       old:50.867
+       15 level, 156sec
 '''
 
 from cmath import inf
@@ -16,10 +16,9 @@ from queue import PriorityQueue
 import string
 import copy
 from sys import argv
-from turtle import goto
 
 # Global Variables
-depth_limit = 12
+depth_limit = 15
 state_cache = {}
 
 # Compute the ultility value of the state
@@ -264,22 +263,21 @@ def AlphaBeta(state:list, isRed:bool, alpha:int, beta:int, depth:int) -> tuple[l
     # Recurcively iterate nodes as in DFS
     while not potential_position.empty():
         next_position = potential_position.get()[2]
+
         '''=================================Cache Check======================================'''
-        # next_value = int()
-        # # Convert the state into string format used in cache
-        # next_position_string = ''.join(''.join(row) for row in next_position) + 'R' if isRed else 'B'
-        # __, next_value = AlphaBeta(next_position, not isRed, alpha, beta, depth+1)
-        # # Check if the state is in cache
-        # if next_position_string in state_cache:
-        #     next_value = state_cache[next_position_string]
-        # else:
-        #     # Switch to opponent and increment depth
-        #     # __, next_value = AlphaBeta(next_position, not isRed, alpha, beta, depth+1)
-        #     # Add to cache
-        #     state_cache[next_position_string] = next_value
+        next_value = int()
+        # Convert the state into string format used in cache
+        next_position_string = ''.join(''.join(row) for row in next_position) + ('R' if isRed else 'B')
+        # Check if the state is in cache and the stored state have a lower level than the current
+        if next_position_string in state_cache and depth >= state_cache[next_position_string][-1]:
+            next_value = state_cache[next_position_string][0]
+        else:
+            # Switch to opponent and increment depth
+            __, next_value = AlphaBeta(next_position, not isRed, alpha, beta, depth+1)
+            # Add to cache
+            state_cache[next_position_string] = (next_value, depth)
         '''=================================================================================='''
-        # Switch to opponent and increment depth
-        __, next_value = AlphaBeta(next_position, not isRed, alpha, beta, depth+1)
+
         # Red == Ourselves == MAX
         if (isRed):
             if (value < next_value):
