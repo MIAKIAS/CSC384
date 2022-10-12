@@ -18,7 +18,7 @@ import copy
 from sys import argv
 
 # Global Variables
-depth_limit = 15
+depth_limit = 9
 state_cache = {}
 
 # Compute the ultility value of the state
@@ -50,7 +50,7 @@ def utility(state:list) -> int:
     # Number of tiles that can jump
     num_jump_pawns = 0
     num_jump_kings = 0
-    # Aggregated distance of the pawns to promotion line
+    # Aggregated distance of the pawns to two promotion lines
     agg_distance = 0
     # Number of unoccupied fields on promotion line
     unoccupied_promotion_field = 0
@@ -59,6 +59,9 @@ def utility(state:list) -> int:
     for item in state[0]:
         if item == '.':
             unoccupied_promotion_field += 1
+    for item in state[7]:
+        if item == '.':
+            unoccupied_promotion_field -= 1
 
     for row in range(len(state)):
         for col in range(len(state[row])):
@@ -128,7 +131,7 @@ def utility(state:list) -> int:
                     num_jump_kings -= 1
 
                 num_kings -= 1
-    return num_pawns + 2*num_kings + num_safe_pawns + num_move_pawns + 2*num_safe_kings + 2*num_move_kings + 2*num_jump_pawns + 4*num_safe_kings + agg_distance
+    return num_pawns + 2*num_kings + num_safe_pawns + num_move_pawns + 2*num_safe_kings + 2*num_move_kings + 2*num_jump_pawns + 4*num_safe_kings + agg_distance + unoccupied_promotion_field
 
 # Check if the game has ended
 def is_game_end(state:list) -> bool:
