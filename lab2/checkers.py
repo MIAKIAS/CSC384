@@ -4,13 +4,19 @@
     Student#: 1004421262
 '''
 
+'''
+FIXME: 1. Timer
+       2. Cache
+       3. Heuristic
+'''
+
 from cmath import inf
 from queue import PriorityQueue
 import string
 import copy
 from sys import argv
 
-depth_limit = 13
+depth_limit = 12
 
 # Compute the ultility value of the state
 def utility(state:list) -> int:
@@ -274,13 +280,21 @@ if __name__== "__main__":
             # Convert the board format to a 8x8 list
             line = list(line.strip())
             initial_state.append(line)
-        for i in initial_state:
-            print(i)
-        print('==========================================')
+    print('=================='+ input_file + '=================')
+    for i in initial_state:
+        print(i)
+    
+    print('==========================================')
+    next_move, __ = AlphaBeta(initial_state, True, -inf, inf, 0)
+    for i in next_move:
+        print(i)
 
-        next_move, __ = AlphaBeta(initial_state, False, -inf, inf, 0)
-        for i in next_move:
-            print(i)
+    with open(output_file, 'w', encoding='utf-8') as f:
+        text = ''
+        for row in next_move:
+            text += ''.join(row)
+            text += '\n'
+        f.write(text.strip())
 
         
 

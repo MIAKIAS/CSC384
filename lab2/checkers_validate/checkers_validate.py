@@ -15,8 +15,11 @@ if __name__ == '__main__':
   print("Input file: input0.txt, output file: output0.txt")
   # os.system("python3 checkers.py input0.txt output0.txt")
 
-  output_read = open("output0.txt", "r")
-  solution_read = open("solution0.txt", "r")
+  output_file = sys.argv[1]
+  solution_file = sys.argv[2]
+
+  output_read = open(output_file, "r")
+  solution_read = open(solution_file, "r")
 
   output_lines = output_read.readlines()
   solution_lines = solution_read.readlines()
