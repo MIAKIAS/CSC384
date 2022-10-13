@@ -44,9 +44,9 @@ def heuristic(state:list) -> int:
     num_pawns_b = 0
     num_kings_R = 0
     num_kings_B = 0
-    # # Number of tiles adjacent to edges
-    # num_safe_pawns = 0
-    # num_safe_kings = 0
+    # Number of tiles adjacent to edges
+    num_safe_pawns = 0
+    num_safe_kings = 0
     # # Number of tiles that can move
     # num_move_pawns = 0
     # num_move_kings = 0
@@ -62,7 +62,7 @@ def heuristic(state:list) -> int:
     # Number of bridges
     num_bridges = 0
     # Number of blocks
-    num_blocks = 0
+    num_dogs = 0
 
     
     # for item in state[0]:
@@ -77,8 +77,8 @@ def heuristic(state:list) -> int:
             if state[row][col] == '.':
                 continue
             elif state[row][col] == 'r':
-                # if col == 0 or col == 7:
-                #     num_safe_pawns += 1
+                if col == 0 or col == 7:
+                    num_safe_pawns += 1
 
                 # if row-1 >= 0 and ((col-1 >= 0 and state[row-1][col-1] == '.') or (col+1 < 8 and state[row-1][col+1]) == '.'):
                 #     num_move_pawns += 1
@@ -91,8 +91,8 @@ def heuristic(state:list) -> int:
 
                 if (row+1 <  8 and col-1 >= 0 and col+1 <  8 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and (state[row+1][col+1] == 'r' or state[row+1][col+1] == 'R')):
                     num_pyramids += 1
-                if (col == 0 and row-2 >= 0 and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B') and (state[row-2][col+2] == 'b' or state[row-2][col+2] == 'B')):
-                    num_blocks -= 1
+                # if (col == 0 and row-2 >= 0 and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B') and (state[row-2][col+2] == 'b' or state[row-2][col+2] == 'B')):
+                #     num_dogs -= 1
 
                 # if (row <= 3):
                 #     agg_distance -= row
@@ -101,8 +101,8 @@ def heuristic(state:list) -> int:
 
                 num_pawns_r += 1
             elif state[row][col] == 'R':
-                # if row == 0 or row == 7 or col == 0 or col == 7:
-                #     num_safe_kings += 1
+                if row == 0 or row == 7 or col == 0 or col == 7:
+                    num_safe_kings += 1
 
                 # if (row-1 >= 0 and ((col-1 >= 0 and state[row-1][col-1] == '.') or (col+1 < 8 and state[row-1][col+1] == '.'))) \
                 # or (row+1 <  8 and ((col-1 >= 0 and state[row+1][col-1] == '.') or (col+1 < 8 and state[row+1][col+1] == '.'))):
@@ -120,14 +120,17 @@ def heuristic(state:list) -> int:
                 if (row+1 <  8 and col-1 >= 0 and col+1 <  8 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and (state[row+1][col+1] == 'r' or state[row+1][col+1] == 'R')):
                     num_pyramids += 1
 
-                if (col == 0 and row-2 >= 0 and row+2 < 8 and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B') and (state[row-2][col+2] == 'b' or state[row-2][col+2] == 'B') \
-                    and (state[row+1][col+1] == 'b' or state[row+1][col+1] == 'B') and (state[row+2][col+2] == 'b' or state[row+2][col+2] == 'B')):
-                    num_blocks -= 1
+                # if (col == 0 and row-2 >= 0 and row+2 < 8 and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B') and (state[row-2][col+2] == 'b' or state[row-2][col+2] == 'B') \
+                #     and (state[row+1][col+1] == 'b' or state[row+1][col+1] == 'B') and (state[row+2][col+2] == 'b' or state[row+2][col+2] == 'B')):
+                #     num_dogs -= 1
+                # if (col == 7 and row-2 >= 0 and row+2 < 8 and (state[row-1][col-1] == 'b' or state[row-1][col-1] == 'B') and (state[row-2][col-2] == 'b' or state[row-2][col-2] == 'B') \
+                #     and (state[row+1][col-1] == 'b' or state[row+1][col-1] == 'B') and (state[row+2][col-2] == 'b' or state[row+2][col-2] == 'B')):
+                #     num_dogs -= 1
 
                 num_kings_R += 1
             elif state[row][col] == 'b':
-                # if col == 0 or col == 7:
-                #     num_safe_pawns -= 1
+                if col == 0 or col == 7:
+                    num_safe_pawns -= 1
 
                 # if row+1 <  8 and ((col-1 >= 0 and state[row+1][col-1] == '.') or (col+1 < 8 and state[row+1][col+1] == '.')):
                 #     num_move_pawns -= 1
@@ -140,8 +143,8 @@ def heuristic(state:list) -> int:
                 if (row-1 >= 0 and col-1 >= 0 and col+1 <  8 and (state[row-1][col-1] == 'b' or state[row-1][col-1] == 'B') and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B')):
                     num_pyramids -= 1
 
-                if (col == 7 and row+2 < 8 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and (state[row+2][col-2] == 'r' or state[row+2][col-2] == 'R')):
-                    num_blocks += 1
+                # if (col == 7 and row+2 < 8 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and (state[row+2][col-2] == 'r' or state[row+2][col-2] == 'R')):
+                #     num_dogs += 1
 
                 # if (row <= 3):
                 #     agg_distance += row
@@ -150,8 +153,8 @@ def heuristic(state:list) -> int:
 
                 num_pawns_b += 1
             else: # state[row][col] == 'B'
-                # if row == 0 or row == 7 or col == 0 or col == 7:
-                #     num_safe_kings -= 1
+                if row == 0 or row == 7 or col == 0 or col == 7:
+                    num_safe_kings -= 1
 
                 # if (row-1 >= 0 and ((col-1 >= 0 and state[row-1][col-1] == '.') or (col+1 < 8 and state[row-1][col+1] == '.'))) \
                 # or (row+1 <  8 and ((col-1 >= 0 and state[row+1][col-1] == '.') or (col+1 < 8 and state[row+1][col+1] == '.'))):
@@ -169,9 +172,12 @@ def heuristic(state:list) -> int:
                 if (row-1 >= 0 and col-1 >= 0 and col+1 <  8 and (state[row-1][col-1] == 'b' or state[row-1][col-1] == 'B') and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B')):
                     num_pyramids -= 1
 
-                if (col == 7 and row-2 >= 0 and row+2 < 8 and (state[row-1][col-1] == 'r' or state[row-1][col-1] == 'R') and (state[row-2][col-2] == 'r' or state[row-2][col-2] == 'R') \
-                    and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and (state[row+2][col-2] == 'r' or state[row+2][col-2] == 'R')):
-                    num_blocks -= 1
+                # if (col == 7 and row-2 >= 0 and row+2 < 8 and (state[row-1][col-1] == 'r' or state[row-1][col-1] == 'R') and (state[row-2][col-2] == 'r' or state[row-2][col-2] == 'R') \
+                #     and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and (state[row+2][col-2] == 'r' or state[row+2][col-2] == 'R')):
+                #     num_dogs += 1
+                # if (col == 0 and row-2 >= 0 and row+2 < 8 and (state[row-1][col+1] == 'r' or state[row-1][col+1] == 'R') and (state[row-2][col+2] == 'r' or state[row-2][col+2] == 'R') \
+                #     and (state[row+1][col+1] == 'r' or state[row+1][col+1] == 'R') and (state[row+2][col+2] == 'r' or state[row+2][col+2] == 'R')):
+                #     num_dogs += 1
 
                 num_kings_B += 1
 
@@ -180,11 +186,30 @@ def heuristic(state:list) -> int:
     if (state[0][1] == 'b' or state[0][1] == 'B') and (state[0][5] == 'b' or state[0][5] == 'B'):
         num_bridges -= 1
     if (state[1][0] == 'r' and (state[0][1] == 'b' or state[0][1] == 'B')):
-        num_blocks -= 1
+        num_dogs -= 1
     if (state[6][7] == 'b' and (state[7][6] == 'r' or state[7][6] == 'R')):
-        num_blocks += 1
+        num_dogs += 1
 
-    return num_pawns_r - num_pawns_b + 2 * (num_kings_R - num_kings_B) + num_pyramids + 0.5 * (num_jump_kings + num_jump_pawns) + num_blocks + num_bridges
+    value = num_pawns_r - num_pawns_b + 2 * (num_kings_R - num_kings_B) \
+            + num_pyramids \
+            + num_dogs \
+            + num_bridges \
+            + 0.1 * (num_jump_kings + num_jump_pawns) \
+            + 0.1 * (num_safe_pawns + num_safe_kings)
+
+    if (num_pawns_r+num_kings_R == 0):
+        return -1000 * abs(value)
+    elif (num_pawns_b+num_kings_B == 0):
+        return 1000 * abs(value)
+    # elif (num_pawns_r+num_kings_R <= 3 or num_pawns_b+num_kings_B <= 3):
+    #     if (successors(state, False, True).qsize() == 0):
+    #         return inf
+    #     elif (successors(state, True, True).qsize() == 0):
+    #         return -inf
+    # if (num_pawns_r+num_kings_R <= 3 or num_pawns_b+num_kings_B <= 3):
+    #     return num_pawns_r - num_pawns_b + 2 * (num_kings_R - num_kings_B) 
+    else:
+        return value
 
 # Check if the game has ended
 def is_game_end(state:list, isRed:bool) -> bool:
@@ -355,9 +380,10 @@ def successors(state:list, isRed:bool, terminateCheck:bool=False) -> PriorityQue
                         new_state[i-1][j-1] = 'R'
                     else:
                         new_state[i-1][j-1] = state[i][j]
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                     if terminateCheck:
+                        successors.put((0,0))
                         return successors
+                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                 # Red can move up-right
                 if (i-1 >= 0 and j+1 < 8 and state[i-1][j+1] == '.'):
                     new_state = copy.deepcopy(state)
@@ -367,25 +393,28 @@ def successors(state:list, isRed:bool, terminateCheck:bool=False) -> PriorityQue
                         new_state[i-1][j+1] = 'R'
                     else:
                         new_state[i-1][j+1] = state[i][j]
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                     if terminateCheck:
+                        successors.put((0,0))
                         return successors
+                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                 # RED KING can move down-left
                 if (state[i][j] == 'R' and i+1 < 8 and j-1 >= 0 and state[i+1][j-1] == '.'):
                     new_state = copy.deepcopy(state)
                     new_state[i][j] = '.'
                     new_state[i+1][j-1] = state[i][j]
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                     if terminateCheck:
+                        successors.put((0,0))
                         return successors
+                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                 # RED KING can move down-right
                 if (state[i][j] == 'R' and i+1 < 8 and j+1 < 8 and state[i+1][j+1] == '.'):
                     new_state = copy.deepcopy(state)
                     new_state[i][j] = '.'
                     new_state[i+1][j+1] = state[i][j]
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                     if terminateCheck:
+                        successors.put((0,0))
                         return successors
+                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
             else:
                 # Black can move down-left
                 if (i+1 < 8 and j-1 >= 0 and state[i+1][j-1] == '.'):
@@ -396,9 +425,10 @@ def successors(state:list, isRed:bool, terminateCheck:bool=False) -> PriorityQue
                         new_state[i+1][j-1] = 'B'
                     else:
                         new_state[i+1][j-1] = state[i][j]
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                     if terminateCheck:
+                        successors.put((0,0))
                         return successors
+                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                 # Black can move down-right
                 if (i+1 < 8 and j+1 < 8 and state[i+1][j+1] == '.'):
                     new_state = copy.deepcopy(state)
@@ -408,25 +438,28 @@ def successors(state:list, isRed:bool, terminateCheck:bool=False) -> PriorityQue
                         new_state[i+1][j+1] = 'B'
                     else:
                         new_state[i+1][j+1] = state[i][j]
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                     if terminateCheck:
+                        successors.put((0,0))
                         return successors
+                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                 # BLACK KING can move up-left
                 if (state[i][j] == 'B' and i-1 >= 0 and j-1 >= 0 and state[i-1][j-1] == '.'):
                     new_state = copy.deepcopy(state)
                     new_state[i][j] = '.'
                     new_state[i-1][j-1] = state[i][j]
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                     if terminateCheck:
+                        successors.put((0,0))
                         return successors
+                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                 # BLACK KING can move up-right
                 if (state[i][j] == 'B' and i-1 >= 0 and j+1 < 8 and state[i-1][j+1] == '.'):
                     new_state = copy.deepcopy(state)
                     new_state[i][j] = '.'
                     new_state[i-1][j+1] = state[i][j]
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                     if terminateCheck:
+                        successors.put((0,0))
                         return successors
+                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
     return successors
 
 # Alpha-Beta Pruning Implementation
