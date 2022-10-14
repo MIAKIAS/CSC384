@@ -12,11 +12,13 @@ from queue import PriorityQueue
 
 if __name__ == '__main__':
   # Invoke the shell command to test the checkers solver
-  print("Input file: input0.txt, output file: output0.txt")
+ 
   # os.system("python3 checkers.py input0.txt output0.txt")
 
   output_file = sys.argv[1]
   solution_file = sys.argv[2]
+
+  print("Check: " + output_file)
 
   output_read = open(output_file, "r")
   solution_read = open(solution_file, "r")

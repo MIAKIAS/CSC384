@@ -2,7 +2,13 @@
     Fall 2022 - CSC384 - Lab2
     Author: Weizhou Wang
     Student#: 1004421262
-    Usage: To run simple utility, please replace all the heuristic() calls to utility()
+'''
+
+'''
+FIXME: 
+       2. Cache: Finished, but need to tune if comparing depth
+       3. Heuristic
+       15 level, 64.02sec
 '''
 
 from cmath import inf
@@ -31,134 +37,154 @@ def utility(state:list) -> int:
     return score
 
 # Compute my own heuristic value of the state using researched heuristic function
-def heuristic(state:list) -> int:
+# def heuristic(state:list) -> int:
 
-    # Number of corresponding tiles
-    num_pieces_r = 0
-    num_pieces_b = 0
-    # Number of tiles adjacent to edges
-    num_safe_pawns = 0
-    num_safe_kings = 0
-    # Number of tiles that can jump
-    num_jump_pawns = 0
-    num_jump_kings = 0
-    # Aggregated distance of the pawns to two promotion lines
-    # agg_distance = 0
-    # Number of unoccupied fields on promotion line
-    unoccupied_promotion_field = 0
-    # Number of pyramid shapes
-    num_pyramids = 0
-    # Number of bridges
-    num_bridges = 0
-    # Number of dog patterns
-    num_dogs = 0
+#     # Number of corresponding tiles
+#     num_pawns_r = 0
+#     num_pawns_b = 0
+#     num_kings_R = 0
+#     num_kings_B = 0
+#     # # Number of tiles adjacent to edges
+#     # num_safe_pawns = 0
+#     # num_safe_kings = 0
+#     # # Number of tiles that can move
+#     # num_move_pawns = 0
+#     # num_move_kings = 0
+#     # Number of tiles that can jump
+#     num_jump_pawns = 0
+#     num_jump_kings = 0
+#     # # Aggregated distance of the pawns to two promotion lines
+#     # agg_distance = 0
+#     # # Number of unoccupied fields on promotion line
+#     # unoccupied_promotion_field = 0
+#     # Number of pyramid shapes
+#     num_pyramids = 0
+#     # Number of bridges
+#     num_bridges = 0
+#     # Number of blocks
+#     num_blocks = 0
 
     
-    # Since the pieces can only on half locations of the row, we do not need to visit all 8 elements
-    for i in [1,3,5,7]:
-        if state[0][i] == '.':
-            unoccupied_promotion_field += 1
-    for i in [0,2,4,6]:
-        if state[0][i] == '.':
-            unoccupied_promotion_field -= 1
+#     # for item in state[0]:
+#     #     if item == '.':
+#     #         unoccupied_promotion_field += 1
+#     # for item in state[7]:
+#     #     if item == '.':
+#     #         unoccupied_promotion_field -= 1
 
-    for row in range(len(state)):
-        for col in range(len(state[row])):
-            if state[row][col] == '.':
-                continue
-            elif state[row][col] == 'r':
-                # Can only on side edges, otherwise, it is a king
-                if col == 0 or col == 7:
-                    num_safe_pawns += 1
+#     for row in range(len(state)):
+#         for col in range(len(state[row])):
+#             if state[row][col] == '.':
+#                 continue
+#             elif state[row][col] == 'r':
+#                 # if col == 0 or col == 7:
+#                 #     num_safe_pawns += 1
 
-                # Check if it can jump
-                if (row-2 >= 0 and col-2 >= 0 and (state[row-1][col-1] == 'b' or state[row-1][col-1] == 'B') and state[row-2][col-2] == '.') \
-                 or (row-2 >= 0 and col+2 <  8 and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B') and state[row-2][col+2] == '.'):
-                    num_jump_pawns += 1
+#                 # if row-1 >= 0 and ((col-1 >= 0 and state[row-1][col-1] == '.') or (col+1 < 8 and state[row-1][col+1]) == '.'):
+#                 #     num_move_pawns += 1
 
-                # Count the number of pyramids
-                if (row+1 <  8 and col-1 >= 0 and col+1 <  8 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and (state[row+1][col+1] == 'r' or state[row+1][col+1] == 'R')):
-                    num_pyramids += 1
+#                 if (row-2 >= 0 and col-2 >= 0 and (state[row-1][col-1] == 'b' or state[row-1][col-1] == 'B') and state[row-2][col-2] == '.'):
+#                     num_jump_pawns += 1
 
-                # agg_distance -= 7 - row
+#                 if (row-2 >= 0 and col+2 <  8 and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B') and state[row-2][col+2] == '.'):
+#                     num_jump_pawns += 1
 
-                num_pieces_r += 1
-            elif state[row][col] == 'R':
-                if row == 0 or row == 7 or col == 0 or col == 7:
-                    num_safe_kings += 1
+#                 if (row+1 <  8 and col-1 >= 0 and col+1 <  8 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and (state[row+1][col+1] == 'r' or state[row+1][col+1] == 'R')):
+#                     num_pyramids += 1
+#                 if (col == 0 and row-2 >= 0 and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B') and (state[row-2][col+2] == 'b' or state[row-2][col+2] == 'B')):
+#                     num_blocks -= 1
 
-                if (row-2 >= 0 and col-2 >= 0 and (state[row-1][col-1] == 'b' or state[row-1][col-1] == 'B') and state[row-2][col-2] == '.') \
-                or (row-2 >= 0 and col+2 <  8 and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B') and state[row-2][col+2] == '.') \
-                or (row+2 <  8 and col-2 >= 0 and (state[row+1][col-1] == 'b' or state[row+1][col-1] == 'B') and state[row+2][col-2] == '.') \
-                or (row+2 <  8 and col+2 <  8 and (state[row+1][col+1] == 'b' or state[row+1][col+1] == 'B') and state[row+2][col+2] == '.'):
-                    num_jump_kings += 1
+#                 # if (row <= 3):
+#                 #     agg_distance -= row
+#                 # else:
+#                 #     agg_distance -= 7 - row
 
-                if (row+1 <  8 and col-1 >= 0 and col+1 <  8 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and (state[row+1][col+1] == 'r' or state[row+1][col+1] == 'R')):
-                    num_pyramids += 1
+#                 num_pawns_r += 1
+#             elif state[row][col] == 'R':
+#                 # if row == 0 or row == 7 or col == 0 or col == 7:
+#                 #     num_safe_kings += 1
 
-                num_pieces_r += 2
-            elif state[row][col] == 'b':
-                if col == 0 or col == 7:
-                    num_safe_pawns -= 1
+#                 # if (row-1 >= 0 and ((col-1 >= 0 and state[row-1][col-1] == '.') or (col+1 < 8 and state[row-1][col+1] == '.'))) \
+#                 # or (row+1 <  8 and ((col-1 >= 0 and state[row+1][col-1] == '.') or (col+1 < 8 and state[row+1][col+1] == '.'))):
+#                 #     num_move_kings += 1
 
-                if (row+2 <  8 and col-2 >= 0 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and state[row+2][col-2] == '.') \
-                or (row+2 <  8 and col+2 <  8 and (state[row+1][col+1] == 'r' or state[row+1][col+1] == 'R') and state[row+2][col+2] == '.'):
-                    num_jump_pawns -= 1
+#                 if (row-2 >= 0 and col-2 >= 0 and (state[row-1][col-1] == 'b' or state[row-1][col-1] == 'B') and state[row-2][col-2] == '.'):
+#                     num_jump_kings += 1
+#                 if (row-2 >= 0 and col+2 <  8 and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B') and state[row-2][col+2] == '.'):
+#                     num_jump_kings += 1 
+#                 if (row+2 <  8 and col-2 >= 0 and (state[row+1][col-1] == 'b' or state[row+1][col-1] == 'B') and state[row+2][col-2] == '.'):
+#                     num_jump_kings += 1
+#                 if (row+2 <  8 and col+2 <  8 and (state[row+1][col+1] == 'b' or state[row+1][col+1] == 'B') and state[row+2][col+2] == '.'):
+#                     num_jump_kings += 1
 
-                if (row-1 >= 0 and col-1 >= 0 and col+1 <  8 and (state[row-1][col-1] == 'b' or state[row-1][col-1] == 'B') and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B')):
-                    num_pyramids -= 1
+#                 if (row+1 <  8 and col-1 >= 0 and col+1 <  8 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and (state[row+1][col+1] == 'r' or state[row+1][col+1] == 'R')):
+#                     num_pyramids += 1
 
-                # agg_distance += row
+#                 if (col == 0 and row-2 >= 0 and row+2 < 8 and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B') and (state[row-2][col+2] == 'b' or state[row-2][col+2] == 'B') \
+#                     and (state[row+1][col+1] == 'b' or state[row+1][col+1] == 'B') and (state[row+2][col+2] == 'b' or state[row+2][col+2] == 'B')):
+#                     num_blocks -= 1
 
-                num_pieces_b += 1
-            else: # state[row][col] == 'B'
-                if row == 0 or row == 7 or col == 0 or col == 7:
-                    num_safe_kings -= 1
+#                 num_kings_R += 1
+#             elif state[row][col] == 'b':
+#                 # if col == 0 or col == 7:
+#                 #     num_safe_pawns -= 1
 
-                if (row-2 >= 0 and col-2 >= 0 and (state[row-1][col-1] == 'r' or state[row-1][col-1] == 'R') and state[row-2][col-2] == '.') \
-                or (row-2 >= 0 and col+2 <  8 and (state[row-1][col+1] == 'r' or state[row-1][col+1] == 'R') and state[row-2][col+2] == '.') \
-                or (row+2 <  8 and col-2 >= 0 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and state[row+2][col-2] == '.') \
-                or (row+2 <  8 and col+2 <  8 and (state[row+1][col+1] == 'r' or state[row+1][col+1] == 'R') and state[row+2][col+2] == '.'):
-                    num_jump_kings -= 1
+#                 # if row+1 <  8 and ((col-1 >= 0 and state[row+1][col-1] == '.') or (col+1 < 8 and state[row+1][col+1] == '.')):
+#                 #     num_move_pawns -= 1
 
-                if (row-1 >= 0 and col-1 >= 0 and col+1 <  8 and (state[row-1][col-1] == 'b' or state[row-1][col-1] == 'B') and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B')):
-                    num_pyramids -= 1
+#                 if (row+2 <  8 and col-2 >= 0 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and state[row+2][col-2] == '.'):
+#                     num_jump_pawns -= 1
+#                 if (row+2 <  8 and col+2 <  8 and (state[row+1][col+1] == 'r' or state[row+1][col+1] == 'R') and state[row+2][col+2] == '.'):
+#                     num_jump_pawns -= 1
 
-                num_pieces_b += 2
+#                 if (row-1 >= 0 and col-1 >= 0 and col+1 <  8 and (state[row-1][col-1] == 'b' or state[row-1][col-1] == 'B') and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B')):
+#                     num_pyramids -= 1
 
-    # Check the bridges
-    if (state[7][2] == 'r' or state[7][2] == 'R') and (state[7][6] == 'r' or state[7][6] == 'R'):
-        num_bridges += 1
-    if (state[0][1] == 'b' or state[0][1] == 'B') and (state[0][5] == 'b' or state[0][5] == 'B'):
-        num_bridges -= 1
-    # Check the dogs
-    if (state[1][0] == 'r' and (state[0][1] == 'b' or state[0][1] == 'B')):
-        num_dogs -= 1
-    if (state[6][7] == 'b' and (state[7][6] == 'r' or state[7][6] == 'R')):
-        num_dogs += 1
+#                 if (col == 7 and row+2 < 8 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and (state[row+2][col-2] == 'r' or state[row+2][col-2] == 'R')):
+#                     num_blocks += 1
 
-    value = num_pieces_r - num_pieces_b \
-            + 0.5 * num_pyramids \
-            + num_dogs \
-            + num_bridges \
-            + 0.1 * (num_jump_kings + num_jump_pawns) \
-            + 0.1 * (num_safe_pawns + num_safe_kings) \
-            + 0.1 * unoccupied_promotion_field
+#                 # if (row <= 3):
+#                 #     agg_distance += row
+#                 # else:
+#                 #     agg_distance += 7 - row
 
-    # Black wins
-    if (num_pieces_r == 0):
-        return 1000 * value
-    # Red wins
-    elif (num_pieces_b == 0):
-        return 1000 * value
-    # Black Wins
-    elif (successors(state, True, True).qsize()==0):
-        return -1000 * abs(value)
-    # Red wins
-    elif (successors(state, False, True).qsize()==0):
-        return 1000 * abs(value)
-    else:
-        return value
+#                 num_pawns_b += 1
+#             else: # state[row][col] == 'B'
+#                 # if row == 0 or row == 7 or col == 0 or col == 7:
+#                 #     num_safe_kings -= 1
+
+#                 # if (row-1 >= 0 and ((col-1 >= 0 and state[row-1][col-1] == '.') or (col+1 < 8 and state[row-1][col+1] == '.'))) \
+#                 # or (row+1 <  8 and ((col-1 >= 0 and state[row+1][col-1] == '.') or (col+1 < 8 and state[row+1][col+1] == '.'))):
+#                 #     num_move_kings -= 1
+
+#                 if (row-2 >= 0 and col-2 >= 0 and (state[row-1][col-1] == 'r' or state[row-1][col-1] == 'R') and state[row-2][col-2] == '.'):
+#                     num_jump_kings -= 1
+#                 if (row-2 >= 0 and col+2 <  8 and (state[row-1][col+1] == 'r' or state[row-1][col+1] == 'R') and state[row-2][col+2] == '.'):
+#                     num_jump_kings -= 1
+#                 if (row+2 <  8 and col-2 >= 0 and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and state[row+2][col-2] == '.'):
+#                     num_jump_kings -= 1
+#                 if (row+2 <  8 and col+2 <  8 and (state[row+1][col+1] == 'r' or state[row+1][col+1] == 'R') and state[row+2][col+2] == '.'):
+#                     num_jump_kings -= 1
+
+#                 if (row-1 >= 0 and col-1 >= 0 and col+1 <  8 and (state[row-1][col-1] == 'b' or state[row-1][col-1] == 'B') and (state[row-1][col+1] == 'b' or state[row-1][col+1] == 'B')):
+#                     num_pyramids -= 1
+
+#                 if (col == 7 and row-2 >= 0 and row+2 < 8 and (state[row-1][col-1] == 'r' or state[row-1][col-1] == 'R') and (state[row-2][col-2] == 'r' or state[row-2][col-2] == 'R') \
+#                     and (state[row+1][col-1] == 'r' or state[row+1][col-1] == 'R') and (state[row+2][col-2] == 'r' or state[row+2][col-2] == 'R')):
+#                     num_blocks -= 1
+
+#                 num_kings_B += 1
+
+#     if (state[7][2] == 'r' or state[7][2] == 'R') and (state[7][6] == 'r' or state[7][6] == 'R'):
+#         num_bridges += 1
+#     if (state[0][1] == 'b' or state[0][1] == 'B') and (state[0][5] == 'b' or state[0][5] == 'B'):
+#         num_bridges -= 1
+#     if (state[1][0] == 'r' and (state[0][1] == 'b' or state[0][1] == 'B')):
+#         num_blocks -= 1
+#     if (state[6][7] == 'b' and (state[7][6] == 'r' or state[7][6] == 'R')):
+#         num_blocks += 1
+
+#     return num_pawns_r - num_pawns_b + 2 * (num_kings_R - num_kings_B) + num_pyramids + 0.5 * (num_jump_kings + num_jump_pawns) + num_blocks + num_bridges
 
 # Check if the game has ended
 def is_game_end(state:list, isRed:bool) -> bool:
@@ -288,9 +314,9 @@ def jump_finder(state:list, tile:string, i:int, j:int, successors:PriorityQueue,
                 jump_finder(temp_state, tile, i-2, j+2, successors, False)
     if (not isJump and not firstCall):
         if (tile == 'r' or tile == 'R'):
-            successors.put((-1 * heuristic(state), successors.qsize(), state))
+            successors.put((-1 * utility(state), successors.qsize(), state))
         else:
-            successors.put((heuristic(state), successors.qsize(), state))
+            successors.put((utility(state), successors.qsize(), state))
         return False
     return False
 
@@ -329,10 +355,9 @@ def successors(state:list, isRed:bool, terminateCheck:bool=False) -> PriorityQue
                         new_state[i-1][j-1] = 'R'
                     else:
                         new_state[i-1][j-1] = state[i][j]
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                     if terminateCheck:
-                        successors.put((0,0))
                         return successors
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                 # Red can move up-right
                 if (i-1 >= 0 and j+1 < 8 and state[i-1][j+1] == '.'):
                     new_state = copy.deepcopy(state)
@@ -342,28 +367,25 @@ def successors(state:list, isRed:bool, terminateCheck:bool=False) -> PriorityQue
                         new_state[i-1][j+1] = 'R'
                     else:
                         new_state[i-1][j+1] = state[i][j]
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                     if terminateCheck:
-                        successors.put((0,0))
                         return successors
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                 # RED KING can move down-left
                 if (state[i][j] == 'R' and i+1 < 8 and j-1 >= 0 and state[i+1][j-1] == '.'):
                     new_state = copy.deepcopy(state)
                     new_state[i][j] = '.'
                     new_state[i+1][j-1] = state[i][j]
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                     if terminateCheck:
-                        successors.put((0,0))
                         return successors
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                 # RED KING can move down-right
                 if (state[i][j] == 'R' and i+1 < 8 and j+1 < 8 and state[i+1][j+1] == '.'):
                     new_state = copy.deepcopy(state)
                     new_state[i][j] = '.'
                     new_state[i+1][j+1] = state[i][j]
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                     if terminateCheck:
-                        successors.put((0,0))
                         return successors
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
             else:
                 # Black can move down-left
                 if (i+1 < 8 and j-1 >= 0 and state[i+1][j-1] == '.'):
@@ -374,10 +396,9 @@ def successors(state:list, isRed:bool, terminateCheck:bool=False) -> PriorityQue
                         new_state[i+1][j-1] = 'B'
                     else:
                         new_state[i+1][j-1] = state[i][j]
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                     if terminateCheck:
-                        successors.put((0,0))
                         return successors
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                 # Black can move down-right
                 if (i+1 < 8 and j+1 < 8 and state[i+1][j+1] == '.'):
                     new_state = copy.deepcopy(state)
@@ -387,28 +408,25 @@ def successors(state:list, isRed:bool, terminateCheck:bool=False) -> PriorityQue
                         new_state[i+1][j+1] = 'B'
                     else:
                         new_state[i+1][j+1] = state[i][j]
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                     if terminateCheck:
-                        successors.put((0,0))
                         return successors
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                 # BLACK KING can move up-left
                 if (state[i][j] == 'B' and i-1 >= 0 and j-1 >= 0 and state[i-1][j-1] == '.'):
                     new_state = copy.deepcopy(state)
                     new_state[i][j] = '.'
                     new_state[i-1][j-1] = state[i][j]
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                     if terminateCheck:
-                        successors.put((0,0))
                         return successors
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
                 # BLACK KING can move up-right
                 if (state[i][j] == 'B' and i-1 >= 0 and j+1 < 8 and state[i-1][j+1] == '.'):
                     new_state = copy.deepcopy(state)
                     new_state[i][j] = '.'
                     new_state[i-1][j+1] = state[i][j]
+                    successors.put((priority_parameter * utility(new_state), successors.qsize(), new_state))
                     if terminateCheck:
-                        successors.put((0,0))
                         return successors
-                    successors.put((priority_parameter * heuristic(new_state), successors.qsize(), new_state))
     return successors
 
 # Alpha-Beta Pruning Implementation
@@ -417,12 +435,12 @@ def AlphaBeta(state:list, isRed:bool, alpha:int, beta:int, depth:int) -> tuple[l
     best_move = None
     # Check whether we reach the depth limit or the game has ended
     if (depth == depth_limit or is_game_end(state, isRed)):
-        return best_move, heuristic(state)
+        return best_move, utility(state)
     potential_position = successors(state, isRed)
 
     # Check whether it is a terminal state
     if (potential_position.qsize() == 0):
-        return best_move, heuristic(state)
+        return best_move, utility(state)
 
     # Initial value
     value = int()
