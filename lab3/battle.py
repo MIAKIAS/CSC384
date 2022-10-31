@@ -321,6 +321,8 @@ def FC(state:State, ans:list):
 def initialization_checker(ships:list, init_values:set) -> bool:
     if (len(init_values) == 0):
         return True
+    elif (len(ships) == 0):
+        return False
     else:
         init_item = init_values.pop()
 
@@ -328,7 +330,9 @@ def initialization_checker(ships:list, init_values:set) -> bool:
     if (init_item[0] == 'L'):
         for ship in ships:
             if ((init_item[1], init_item[2]) in ship.domain_row):
-                if (initialization_checker(ships.copy().remove(ship), init_values.copy())):
+                temp_ships = ships.copy()
+                temp_ships.remove(ship)
+                if (initialization_checker(temp_ships, init_values.copy())):
                     return True
         return False
     elif (init_item[0] == 'R'):
@@ -336,13 +340,17 @@ def initialization_checker(ships:list, init_values:set) -> bool:
             if (ship.length == 2 and ((init_item[1], init_item[2]-1) in ship.domain_row)) \
                 or (ship.length == 3 and ((init_item[1], init_item[2]-2) in ship.domain_row)) \
                     or (ship.length == 4 and ((init_item[1], init_item[2]-3) in ship.domain_row)):
-                if (initialization_checker(ships.copy().remove(ship), init_values.copy())):
+                temp_ships = ships.copy()
+                temp_ships.remove(ship)
+                if (initialization_checker(temp_ships, init_values.copy())):
                     return True
         return False
     elif (init_item[0] == 'T'):
         for ship in ships:
             if ((init_item[1], init_item[2]) in ship.domain_col):
-                if (initialization_checker(ships.copy().remove(ship), init_values.copy())):
+                temp_ships = ships.copy()
+                temp_ships.remove(ship)
+                if (initialization_checker(temp_ships, init_values.copy())):
                     return True
         return False
     elif (init_item[0] == 'B'):
@@ -350,7 +358,9 @@ def initialization_checker(ships:list, init_values:set) -> bool:
             if (ship.length == 2 and ((init_item[1]-1, init_item[2]) in ship.domain_row)) \
                 or (ship.length == 3 and ((init_item[1]-2, init_item[2]) in ship.domain_row)) \
                     or (ship.length == 4 and ((init_item[1]-3, init_item[2]) in ship.domain_row)):
-                if (initialization_checker(ships.copy().remove(ship), init_values.copy())):
+                temp_ships = ships.copy()
+                temp_ships.remove(ship)
+                if (initialization_checker(temp_ships, init_values.copy())):
                     return True
         return False
     else: #'M'
@@ -362,7 +372,9 @@ def initialization_checker(ships:list, init_values:set) -> bool:
                         or ((init_item[1]-1, init_item[2]) in ship.domain_col) \
                             or (ship.length == 4 and ((init_item[1]-2, init_item[2]) in ship.domain_col))\
                                 ):
-                if (initialization_checker(ships.copy().remove(ship), init_values.copy())):
+                temp_ships = ships.copy()
+                temp_ships.remove(ship)
+                if (initialization_checker(temp_ships, init_values.copy())):
                     return True
         return False
 
