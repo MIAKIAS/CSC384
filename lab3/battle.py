@@ -435,7 +435,8 @@ if __name__ == "__main__":
             if (grid[i][j] == 'W'):
                 continue
             elif (grid[i][j] == '0'):
-                domain_1x1.add((i,j))
+                if (ROW_LIMIT[i] >= 1 and COL_LIMIT[j] >= 1):
+                    domain_1x1.add((i,j))
             # Directly assign values to one 1x1 ship
             elif (grid[i][j] == 'S'):
                 num_init_1x1 += 1
@@ -448,19 +449,25 @@ if __name__ == "__main__":
 
             if (NUMBER_TYPES_SHIPS >= 2):
                 if (j+1 < SIZE and (grid[i][j] == '0' or grid[i][j] == 'L') and (grid[i][j+1] == '0' or grid[i][j+1] == 'R')):
-                    domain_1x2_row.add((i,j))
+                    if (ROW_LIMIT[i] >= 2 and COL_LIMIT[j] >= 1 and COL_LIMIT[j+1] >= 1):
+                        domain_1x2_row.add((i,j))
                 if (i+1 < SIZE and (grid[i][j] == '0' or grid[i][j] == 'T') and (grid[i+1][j] == '0' or grid[i+1][j] == 'B')):
-                    domain_1x2_col.add((i,j))
+                    if (COL_LIMIT[j] >= 2 and ROW_LIMIT[i] >= 1 and ROW_LIMIT[i+1] >= 1):
+                        domain_1x2_col.add((i,j))
             if (NUMBER_TYPES_SHIPS >= 3):
                 if (j+2 < SIZE and (grid[i][j] == '0' or grid[i][j] == 'L') and (grid[i][j+1] == '0' or grid[i][j+1] == 'M') and (grid[i][j+2] == '0' or grid[i][j+2] == 'R')):
-                    domain_1x3_row.add((i,j))
+                    if (ROW_LIMIT[i] >= 3 and COL_LIMIT[j] >= 1 and COL_LIMIT[j+1] >= 1 and COL_LIMIT[j+2] >= 1):
+                        domain_1x3_row.add((i,j))
                 if (i+2 < SIZE and (grid[i][j] == '0' or grid[i][j] == 'T') and (grid[i+1][j] == '0' or grid[i+1][j] == 'M') and (grid[i+2][j] == '0' or grid[i+2][j] == 'B')):
-                    domain_1x3_col.add((i,j))
+                    if (COL_LIMIT[j] >= 3 and ROW_LIMIT[i] >= 1 and ROW_LIMIT[i+1] >= 1 and ROW_LIMIT[i+2] >= 1):
+                        domain_1x3_col.add((i,j))
             if (NUMBER_TYPES_SHIPS >= 4):
                 if (j+3 < SIZE and (grid[i][j] == '0' or grid[i][j] == 'L') and (grid[i][j+1] == '0' or grid[i][j+1] == 'M') and (grid[i][j+2] == '0' or grid[i][j+2] == 'M') and (grid[i][j+3] == '0' or grid[i][j+3] == 'R')):
-                    domain_1x4_row.add((i,j))
+                    if (ROW_LIMIT[i] >= 4 and COL_LIMIT[j] >= 1 and COL_LIMIT[j+1] >= 1 and COL_LIMIT[j+2] >= 1 and COL_LIMIT[j+3] >= 1):
+                        domain_1x4_row.add((i,j))
                 if (i+3 < SIZE and (grid[i][j] == '0' or grid[i][j] == 'T') and (grid[i+1][j] == '0' or grid[i+1][j] == 'M') and (grid[i+2][j] == '0' or grid[i+2][j] == 'M') and (grid[i+3][j] == '0' or grid[i+3][j] == 'B')):
-                    domain_1x4_col.add((i,j))
+                    if (COL_LIMIT[j] >= 4 and ROW_LIMIT[i] >= 1 and ROW_LIMIT[i+1] >= 1 and ROW_LIMIT[i+2] >= 1 and ROW_LIMIT[i+3] >= 1):
+                        domain_1x4_col.add((i,j))
 
     # Initialize each ship with sizes and domains
     SHIP_LIMIT[0] -= num_init_1x1
