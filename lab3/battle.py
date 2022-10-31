@@ -2,10 +2,9 @@
     Fall 2022 - CSC384 - Lab3
     Author: Weizhou Wang
     Student#: 1004421262
-    Usage: 31s all testcases
+    Usage: 
 '''
 from sys import argv
-import heapq
 import copy
 
 # Tile limit per column
@@ -18,8 +17,6 @@ SHIP_LIMIT = list()
 NUMBER_TYPES_SHIPS = int()
 # Size of the grid
 SIZE = int()
-# Tie-breaker for the PriorityQueue
-priority_index = 0
 
 # Class for storing ships
 class Ship:
@@ -54,7 +51,7 @@ def FC(state:State, ans:list):
         return ans
 
     # Pop an unassigned variable
-    cur_ship:Ship = heapq.heappop(state.ships)[2]
+    cur_ship:Ship = state.ships.pop()
 
     '''============================================Horizontal Placement============================================'''
     for row_value in cur_ship.domain_row.copy():
@@ -63,20 +60,39 @@ def FC(state:State, ans:list):
         # Check if adding the ship will exceed the row limit
         # FIXME: 现在还是BT，需要改成FC
         if (state.cur_row[row] + cur_ship.length > ROW_LIMIT[row]):
-            cur_ship.domain_row.remove(row_value)
+            cur_ship.domain_row.remove((row, col))
+            # If DWO, we need to backtrack
+            # if (len(cur_ship.domain_row) == 0):
+            #     if (cur_ship.length == 1):
+            #         return None
+            #     break
             continue
         # Check if adding the ship will exceed the col limit
         if (state.cur_col[col] + 1 > COL_LIMIT[col]):
-            cur_ship.domain_row.remove(row_value)
+            cur_ship.domain_row.remove((row, col))
+            # If DWO, we need to backtrack
+            # if (len(cur_ship.domain_row) == 0):
+            #     if (cur_ship.length == 1):
+            #         return None
+            #     break
             continue
         if (cur_ship.length > 1 and state.cur_col[col+1] + 1 > COL_LIMIT[col+1]):
-            cur_ship.domain_row.remove(row_value)
+            cur_ship.domain_row.remove((row, col))
+            # If DWO, we need to backtrack
+            # if (len(cur_ship.domain_row) == 0):
+            #     break
             continue
         if (cur_ship.length > 2 and state.cur_col[col+2] + 1 > COL_LIMIT[col+2]):
-            cur_ship.domain_row.remove(row_value)
+            cur_ship.domain_row.remove((row, col))
+            # If DWO, we need to backtrack
+            # if (len(cur_ship.domain_row) == 0):
+            #     return
             continue
         if (cur_ship.length > 3 and state.cur_col[col+3] + 1 > COL_LIMIT[col+3]):
-            cur_ship.domain_row.remove(row_value)
+            cur_ship.domain_row.remove((row, col))
+            # If DWO, we need to backtrack
+            # if (len(cur_ship.domain_row) == 0):
+            #     break
             continue
         # Calculate the values that needs to be removed
         new_state = copy.deepcopy(state)
@@ -110,7 +126,6 @@ def FC(state:State, ans:list):
         # Remove values after placing this ship
         DWO = False
         for ship in new_state.ships:
-            ship:Ship = ship[2]
             ship.domain_row -= remove_set_1
             if (ship.length > 1):
                 ship.domain_col -= remove_set_1
@@ -151,14 +166,14 @@ def FC(state:State, ans:list):
                 new_state.init_value.discard(('R', row, col+3))
             
             # Check if the remaining values can be covered
-            temp_ships = list()
-            for item in new_state.ships:
-                if (item[2].length == 1):
-                    continue
-                temp_ships.append(item[2])
+            # No need to check 1x1 ships
+            temp_ships = new_state.ships[SHIP_LIMIT[0]:]
             temp_init = new_state.init_value.copy()
             if (not initialization_checker(temp_ships, temp_init)):
-                cur_ship.domain_row.remove(row_value)
+                cur_ship.domain_row.remove((row, col))
+                # If DWO, we need to backtrack
+                # if (len(cur_ship.domain_row) == 0):
+                #     break
                 continue
         
         # If everything is good, we go to the next level
@@ -195,20 +210,35 @@ def FC(state:State, ans:list):
             # Check if adding the ship will exceed the col limit
             # FIXME: 现在还是BT，需要改成FC
             if (state.cur_col[col] + cur_ship.length > COL_LIMIT[col]):
-                cur_ship.domain_col.remove(col_value)
+                cur_ship.domain_col.remove((row, col))
+                # If DWO, we need to backtrack
+                if (len(cur_ship.domain_col) == 0):
+                    return None
                 continue
             # Check if adding the ship will exceed the row limit
             if (state.cur_row[row] + 1 > ROW_LIMIT[row]):
-                cur_ship.domain_col.remove(col_value)
+                cur_ship.domain_col.remove((row, col))
+                # If DWO, we need to backtrack
+                if (len(cur_ship.domain_col) == 0):
+                    return None
                 continue
             if (state.cur_row[row+1] + 1 > ROW_LIMIT[row+1]):
-                cur_ship.domain_col.remove(col_value)
+                cur_ship.domain_col.remove((row, col))
+                # If DWO, we need to backtrack
+                if (len(cur_ship.domain_col) == 0):
+                    return None
                 continue
             if (cur_ship.length > 2 and state.cur_row[row+2] + 1 > ROW_LIMIT[row+2]):
-                cur_ship.domain_col.remove(col_value)
+                cur_ship.domain_col.remove((row, col))
+                # If DWO, we need to backtrack
+                if (len(cur_ship.domain_col) == 0):
+                    return None
                 continue
             if (cur_ship.length > 3 and state.cur_row[row+3] + 1 > ROW_LIMIT[row+3]):
-                cur_ship.domain_col.remove(col_value)
+                cur_ship.domain_col.remove((row, col))
+                # If DWO, we need to backtrack
+                if (len(cur_ship.domain_col) == 0):
+                    return None
                 continue
             # Calculate the values that needs to be removed
             new_state = copy.deepcopy(state)
@@ -243,7 +273,6 @@ def FC(state:State, ans:list):
             # Remove values after placing this ship
             DWO = False
             for ship in new_state.ships:
-                ship = ship[2]
                 ship.domain_row -= remove_set_1
                 if (ship.length > 1):
                     ship.domain_row -= remove_set_2_row
@@ -282,14 +311,11 @@ def FC(state:State, ans:list):
                     new_state.init_value.discard(('B', row+3, col))
                 
                 # Check if the remaining values can be covered
-                temp_ships = list()
-                for item in new_state.ships:
-                    if (item[2].length == 1):
-                        continue
-                    temp_ships.append(item[2])
+                # No need to check 1x1 ships
+                temp_ships = new_state.ships[SHIP_LIMIT[0]:]
                 temp_init = new_state.init_value.copy()
                 if (not initialization_checker(temp_ships, temp_init)):
-                    cur_ship.domain_col.remove(col_value)
+                    cur_ship.domain_col.remove((row, col))
                     # If DWO, we need to backtrack
                     if (len(cur_ship.domain_col) == 0):
                         return None
@@ -321,8 +347,6 @@ def FC(state:State, ans:list):
 def initialization_checker(ships:list, init_values:set) -> bool:
     if (len(init_values) == 0):
         return True
-    elif (len(ships) == 0):
-        return False
     else:
         init_item = init_values.pop()
 
@@ -378,6 +402,9 @@ def initialization_checker(ships:list, init_values:set) -> bool:
                     return True
         return False
 
+    
+
+
 if __name__ == "__main__":
     if len(argv) != 3:
         print('Wrong input/output parameters...')
@@ -430,6 +457,7 @@ if __name__ == "__main__":
     # Read in the possible domain
     num_init_1x1 = 0
     init_state = State()
+    temp_ans = list()
     for i in range(SIZE):
         for j in range(SIZE):
             if (grid[i][j] == 'W'):
@@ -439,8 +467,7 @@ if __name__ == "__main__":
             # Directly assign values to one 1x1 ship
             elif (grid[i][j] == 'S'):
                 num_init_1x1 += 1
-                heapq.heappush(init_state.ships, (1, priority_index, Ship(1, {(i,j)})))
-                priority_index += 1
+                init_state.ships.append(Ship(1, {(i,j)}))
                 continue
             # We need to check later if the rest of the initialized values are aligned with our assignments
             else:
@@ -467,25 +494,22 @@ if __name__ == "__main__":
     for i in range(NUMBER_TYPES_SHIPS):
         for j in range(SHIP_LIMIT[i]):
             if (i == 0):
-                heapq.heappush(init_state.ships, (len(domain_1x1), priority_index, Ship(i+1, copy.deepcopy(domain_1x1))))
+                init_state.ships.append(Ship(i+1, copy.deepcopy(domain_1x1)))
             elif (i == 1):
-                heapq.heappush(init_state.ships, (len(domain_1x2_row)+len(domain_1x2_col), priority_index, Ship(i+1, copy.deepcopy(domain_1x2_row), copy.deepcopy(domain_1x2_col))))
+                init_state.ships.append(Ship(i+1, copy.deepcopy(domain_1x2_row), copy.deepcopy(domain_1x2_col)))
             elif (i == 2):
-                heapq.heappush(init_state.ships, (len(domain_1x3_row)+len(domain_1x3_col), priority_index, Ship(i+1, copy.deepcopy(domain_1x3_row), copy.deepcopy(domain_1x3_col))))
+                init_state.ships.append(Ship(i+1, copy.deepcopy(domain_1x3_row), copy.deepcopy(domain_1x3_col)))
             else:
-                heapq.heappush(init_state.ships, (len(domain_1x4_row)+len(domain_1x4_col), priority_index, Ship(i+1, copy.deepcopy(domain_1x4_row), copy.deepcopy(domain_1x4_col))))
-            priority_index += 1
+                init_state.ships.append(Ship(i+1, copy.deepcopy(domain_1x4_row), copy.deepcopy(domain_1x4_col)))
     SHIP_LIMIT[0] += num_init_1x1
 
     # for item in init_state.ships:
-    #     item = item[2]
     #     print(item.length)
     #     print(item.domain_row)
     #     print(item.domain_col)
     #     print("==========================")
 
     # Call Forward Checking
-    temp_ans = list()
     temp_ans = FC(init_state, temp_ans)
 
     # Output answer
@@ -501,12 +525,12 @@ if __name__ == "__main__":
             text += '\n'
         f.write(text.strip())
 
-    for i in range(SIZE):
-        ans[i].insert(0, str(ROW_LIMIT[i]))
-    col_limit = [str(i) for i in COL_LIMIT]
-    col_limit.insert(0, ' ')
-    ans.insert(0, col_limit)
+    # for i in range(SIZE):
+    #     ans[i].insert(0, str(ROW_LIMIT[i]))
+    # col_limit = [str(i) for i in COL_LIMIT]
+    # col_limit.insert(0, ' ')
+    # ans.insert(0, col_limit)
 
-    for i in ans:
-        print(i)
+    # for i in ans:
+    #     print(i)
 
