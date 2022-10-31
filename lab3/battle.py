@@ -363,9 +363,9 @@ def initialization_checker(ships:list, init_values:set) -> bool:
         return False
     elif (init_item[0] == 'B'):
         for ship in ships:
-            if (ship.length == 2 and ((init_item[1]-1, init_item[2]) in ship.domain_row)) \
-                or (ship.length == 3 and ((init_item[1]-2, init_item[2]) in ship.domain_row)) \
-                    or (ship.length == 4 and ((init_item[1]-3, init_item[2]) in ship.domain_row)):
+            if (ship.length == 2 and ((init_item[1]-1, init_item[2]) in ship.domain_col)) \
+                or (ship.length == 3 and ((init_item[1]-2, init_item[2]) in ship.domain_col)) \
+                    or (ship.length == 4 and ((init_item[1]-3, init_item[2]) in ship.domain_col)):
                 temp_ships = ships.copy()
                 temp_ships.remove(ship)
                 if (initialization_checker(temp_ships, init_values.copy())):
