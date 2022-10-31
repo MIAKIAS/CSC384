@@ -61,38 +61,19 @@ def FC(state:State, ans:list):
         # FIXME: 现在还是BT，需要改成FC
         if (state.cur_row[row] + cur_ship.length > ROW_LIMIT[row]):
             cur_ship.domain_row.remove((row, col))
-            # If DWO, we need to backtrack
-            # if (len(cur_ship.domain_row) == 0):
-            #     if (cur_ship.length == 1):
-            #         return None
-            #     break
             continue
         # Check if adding the ship will exceed the col limit
         if (state.cur_col[col] + 1 > COL_LIMIT[col]):
             cur_ship.domain_row.remove((row, col))
-            # If DWO, we need to backtrack
-            # if (len(cur_ship.domain_row) == 0):
-            #     if (cur_ship.length == 1):
-            #         return None
-            #     break
             continue
         if (cur_ship.length > 1 and state.cur_col[col+1] + 1 > COL_LIMIT[col+1]):
             cur_ship.domain_row.remove((row, col))
-            # If DWO, we need to backtrack
-            # if (len(cur_ship.domain_row) == 0):
-            #     break
             continue
         if (cur_ship.length > 2 and state.cur_col[col+2] + 1 > COL_LIMIT[col+2]):
             cur_ship.domain_row.remove((row, col))
-            # If DWO, we need to backtrack
-            # if (len(cur_ship.domain_row) == 0):
-            #     return
             continue
         if (cur_ship.length > 3 and state.cur_col[col+3] + 1 > COL_LIMIT[col+3]):
             cur_ship.domain_row.remove((row, col))
-            # If DWO, we need to backtrack
-            # if (len(cur_ship.domain_row) == 0):
-            #     break
             continue
         # Calculate the values that needs to be removed
         new_state = copy.deepcopy(state)
@@ -171,9 +152,6 @@ def FC(state:State, ans:list):
             temp_init = new_state.init_value.copy()
             if (not initialization_checker(temp_ships, temp_init)):
                 cur_ship.domain_row.remove((row, col))
-                # If DWO, we need to backtrack
-                # if (len(cur_ship.domain_row) == 0):
-                #     break
                 continue
         
         # If everything is good, we go to the next level
