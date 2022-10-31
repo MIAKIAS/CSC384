@@ -45,7 +45,6 @@ class State:
         self.ships = list()
         # Need to be aligned with the intial value
         self.init_value = set()
-        
 
 # The Forward Checking Algorithm
 def FC(state:State, ans:list):
@@ -55,7 +54,6 @@ def FC(state:State, ans:list):
 
     # Pop an unassigned variable
     cur_ship:Ship = heapq.heappop(state.ships)[2]
-
     '''============================================Horizontal Placement============================================'''
     for row_value in cur_ship.domain_row.copy():
         row = row_value[0]
@@ -153,9 +151,8 @@ def FC(state:State, ans:list):
             # Check if the remaining values can be covered
             temp_ships = list()
             for item in new_state.ships:
-                if (item[2].length == 1):
-                    continue
-                temp_ships.append(item[2])
+                if (item[2].length > 1):
+                    temp_ships.append(item[2])
             temp_init = new_state.init_value.copy()
             if (not initialization_checker(temp_ships, temp_init)):
                 cur_ship.domain_row.remove(row_value)
@@ -219,8 +216,6 @@ def FC(state:State, ans:list):
                 new_state.cur_row[row+2] += 1
             if (cur_ship.length > 3):
                 new_state.cur_row[row+3] += 1
-            if (cur_ship.length > 4):
-                new_state.cur_row[row+4] += 1
             remove_set_1 = set()
             remove_set_2_row = set()
             remove_set_2_col = set()
@@ -284,15 +279,15 @@ def FC(state:State, ans:list):
                 # Check if the remaining values can be covered
                 temp_ships = list()
                 for item in new_state.ships:
-                    if (item[2].length == 1):
-                        continue
-                    temp_ships.append(item[2])
+                    if (item[2].length > 1):
+                        temp_ships.append(item[2])
                 temp_init = new_state.init_value.copy()
                 if (not initialization_checker(temp_ships, temp_init)):
                     cur_ship.domain_col.remove(col_value)
                     # If DWO, we need to backtrack
                     if (len(cur_ship.domain_col) == 0):
                         return None
+                    continue
 
             # If everything is good, we go to the next level
             if (cur_ship.length == 2):
@@ -355,9 +350,9 @@ def initialization_checker(ships:list, init_values:set) -> bool:
         return False
     elif (init_item[0] == 'B'):
         for ship in ships:
-            if (ship.length == 2 and ((init_item[1]-1, init_item[2]) in ship.domain_row)) \
-                or (ship.length == 3 and ((init_item[1]-2, init_item[2]) in ship.domain_row)) \
-                    or (ship.length == 4 and ((init_item[1]-3, init_item[2]) in ship.domain_row)):
+            if (ship.length == 2 and ((init_item[1]-1, init_item[2]) in ship.domain_col)) \
+                or (ship.length == 3 and ((init_item[1]-2, init_item[2]) in ship.domain_col)) \
+                    or (ship.length == 4 and ((init_item[1]-3, init_item[2]) in ship.domain_col)):
                 temp_ships = ships.copy()
                 temp_ships.remove(ship)
                 if (initialization_checker(temp_ships, init_values.copy())):
@@ -386,8 +381,8 @@ if __name__ == "__main__":
     # Read in the input/output file names
     __, input_file, output_file = argv
 
-    # input_file = "/h/u17/c1/00/wangw222/csc384/lab3/battle_validate/input_easy1.txt"
-    # output_file = "/h/u17/c1/00/wangw222/csc384/lab3/output_easy1.txt"
+    # input_file = "/h/u17/c1/00/wangw222/csc384/lab3/battle_validate/9.txt"
+    # output_file = "/h/u17/c1/00/wangw222/csc384/lab3/9out.txt"
 
     grid = list()
     with open(input_file, 'r', encoding='utf-8') as f:
@@ -508,12 +503,12 @@ if __name__ == "__main__":
             text += '\n'
         f.write(text.strip())
 
-    for i in range(SIZE):
-        ans[i].insert(0, str(ROW_LIMIT[i]))
-    col_limit = [str(i) for i in COL_LIMIT]
-    col_limit.insert(0, ' ')
-    ans.insert(0, col_limit)
+    # for i in range(SIZE):
+    #     ans[i].insert(0, str(ROW_LIMIT[i]))
+    # col_limit = [str(i) for i in COL_LIMIT]
+    # col_limit.insert(0, ' ')
+    # ans.insert(0, col_limit)
 
-    for i in ans:
-        print(i)
+    # for i in ans:
+    #     print(i)
 
