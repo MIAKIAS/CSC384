@@ -227,8 +227,6 @@ def FC(state:State, ans:list):
                 new_state.cur_row[row+2] += 1
             if (cur_ship.length > 3):
                 new_state.cur_row[row+3] += 1
-            if (cur_ship.length > 4):
-                new_state.cur_row[row+4] += 1
             remove_set_1 = set()
             remove_set_2_row = set()
             remove_set_2_col = set()
