@@ -20,13 +20,15 @@ SIZE = int()
 
 # Class for storing ships
 class Ship:
-    # Type/length of the ship
-    length = int()
-    # Domain of the ship
-    domain_row = set()
-    domain_col = set()
     # The constructor
-    def __init__(self, length, domain_row=None, domain_col=None):
+    def __init__(self):
+        # Type/length of the ship
+        self.length = int()
+        # Domain of the ship
+        self.domain_row = set()
+        self.domain_col = set()
+    # The constructor
+    def __init__(self, length:int, domain_row:set=None, domain_col:set=None):
         self.length = length
         self.domain_row = domain_row
         self.domain_col = domain_col
@@ -148,7 +150,10 @@ def FC(state:State, ans:list):
             
             # Check if the remaining values can be covered
             # No need to check 1x1 ships
-            temp_ships = new_state.ships[SHIP_LIMIT[0]:]
+            temp_ships = list()
+            for item in new_state.ships:
+                if item.length > 1:
+                    temp_ships.append(item)
             temp_init = new_state.init_value.copy()
             if (not initialization_checker(temp_ships, temp_init)):
                 cur_ship.domain_row.remove((row, col))
@@ -288,7 +293,10 @@ def FC(state:State, ans:list):
                 
                 # Check if the remaining values can be covered
                 # No need to check 1x1 ships
-                temp_ships = new_state.ships[SHIP_LIMIT[0]:]
+                temp_ships = list()
+                for item in new_state.ships:
+                    if item.length > 1:
+                        temp_ships.append(item)
                 temp_init = new_state.init_value.copy()
                 if (not initialization_checker(temp_ships, temp_init)):
                     cur_ship.domain_col.remove((row, col))
@@ -389,8 +397,8 @@ if __name__ == "__main__":
     # Read in the input/output file names
     __, input_file, output_file = argv
 
-    # input_file = "/h/u17/c1/00/wangw222/csc384/lab3/battle_validate/input_easy1.txt"
-    # output_file = "/h/u17/c1/00/wangw222/csc384/lab3/output_easy1.txt"
+    # input_file = "/h/u17/c1/00/wangw222/csc384/lab3/battle_validate/10.txt"
+    # output_file = "/h/u17/c1/00/wangw222/csc384/lab3/10out.txt"
 
     grid = list()
     with open(input_file, 'r', encoding='utf-8') as f:
