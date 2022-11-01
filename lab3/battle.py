@@ -2,7 +2,7 @@
     Fall 2022 - CSC384 - Lab3
     Author: Weizhou Wang
     Student#: 1004421262
-    Usage: 31s all testcases
+    Usage: 6.7s all testcases
 '''
 from sys import argv
 import heapq
@@ -18,6 +18,8 @@ SHIP_LIMIT = list()
 NUMBER_TYPES_SHIPS = int()
 # Size of the grid
 SIZE = int()
+# Parameter for 1x1 ship in Priority queue
+INDEX_1X1 = 2
 # Tie-breaker for the PriorityQueue
 priority_index = 0
 
@@ -108,24 +110,26 @@ def FC(state:State, ans:list):
         # Remove values after placing this ship
         DWO = False
         for ship in new_state.ships:
-            ship:Ship = ship[2]
-            ship.domain_row -= remove_set_1
-            if (ship.length > 1):
-                ship.domain_col -= remove_set_1
-                ship.domain_col -= remove_set_2_col
-                ship.domain_row -= remove_set_2_row
-                if (ship.length > 2):
-                    ship.domain_row -= remove_set_3_row
-                    ship.domain_col -= remove_set_3_col
-                if (ship.length > 3):
-                    ship.domain_row -= remove_set_4_row
-                    ship.domain_col -= remove_set_4_col
-                if (len(ship.domain_col) == 0 and len(ship.domain_row) == 0):
+            ship[2].domain_row -= remove_set_1
+            if (ship[2].length > 1):
+                ship[2].domain_col -= remove_set_1
+                ship[2].domain_col -= remove_set_2_col
+                ship[2].domain_row -= remove_set_2_row
+                if (ship[2].length > 2):
+                    ship[2].domain_row -= remove_set_3_row
+                    ship[2].domain_col -= remove_set_3_col
+                if (ship[2].length > 3):
+                    ship[2].domain_row -= remove_set_4_row
+                    ship[2].domain_col -= remove_set_4_col
+                if (len(ship[2].domain_col) == 0 and len(ship[2].domain_row) == 0):
                     DWO = True
                     break
-            elif (len(ship.domain_row) == 0):
-                DWO = True
-                break
+                ship[0] = len(ship[2].domain_col) + len(ship[2].domain_row)
+            else:
+                if (len(ship[2].domain_row) == 0):
+                    DWO = True
+                    break
+                ship[0] = len(ship[2].domain_row) * INDEX_1X1
         # If DWO, try next value
         if (DWO):
             continue
@@ -238,24 +242,26 @@ def FC(state:State, ans:list):
             # Remove values after placing this ship
             DWO = False
             for ship in new_state.ships:
-                ship = ship[2]
-                ship.domain_row -= remove_set_1
-                if (ship.length > 1):
-                    ship.domain_row -= remove_set_2_row
-                    ship.domain_col -= remove_set_1
-                    ship.domain_col -= remove_set_2_col
-                    if (ship.length > 2):
-                        ship.domain_row -= remove_set_3_row
-                        ship.domain_col -= remove_set_3_col
-                    if (ship.length > 3):
-                        ship.domain_row -= remove_set_4_row
-                        ship.domain_col -= remove_set_4_col
-                    if (len(ship.domain_col) == 0 and len(ship.domain_row) == 0):
+                ship[2].domain_row -= remove_set_1
+                if (ship[2].length > 1):
+                    ship[2].domain_row -= remove_set_2_row
+                    ship[2].domain_col -= remove_set_1
+                    ship[2].domain_col -= remove_set_2_col
+                    if (ship[2].length > 2):
+                        ship[2].domain_row -= remove_set_3_row
+                        ship[2].domain_col -= remove_set_3_col
+                    if (ship[2].length > 3):
+                        ship[2].domain_row -= remove_set_4_row
+                        ship[2].domain_col -= remove_set_4_col
+                    if (len(ship[2].domain_col) == 0 and len(ship[2].domain_row) == 0):
                         DWO = True
                         break
-                elif (len(ship.domain_row) == 0):
-                    DWO = True
-                    break
+                    ship[0] = len(ship[2].domain_col) + len(ship[2].domain_row)
+                else:
+                    if (len(ship[2].domain_row) == 0):
+                        DWO = True
+                        break
+                    ship[0] = len(ship[2].domain_row) * INDEX_1X1
             # If DWO, try next value
             if (DWO):
                 continue
@@ -435,7 +441,7 @@ if __name__ == "__main__":
             # Directly assign values to one 1x1 ship
             elif (grid[i][j] == 'S'):
                 num_init_1x1 += 1
-                heapq.heappush(init_state.ships, (1, priority_index, Ship(1, {(i,j)})))
+                heapq.heappush(init_state.ships, [1, priority_index, Ship(1, {(i,j)})])
                 priority_index += 1
                 continue
             # We need to check later if the rest of the initialized values are aligned with our assignments
@@ -469,13 +475,13 @@ if __name__ == "__main__":
     for i in range(NUMBER_TYPES_SHIPS):
         for j in range(SHIP_LIMIT[i]):
             if (i == 0):
-                heapq.heappush(init_state.ships, (len(domain_1x1), priority_index, Ship(i+1, copy.deepcopy(domain_1x1))))
+                heapq.heappush(init_state.ships, [len(domain_1x1)*INDEX_1X1, priority_index, Ship(i+1, copy.deepcopy(domain_1x1))])
             elif (i == 1):
-                heapq.heappush(init_state.ships, (len(domain_1x2_row)+len(domain_1x2_col), priority_index, Ship(i+1, copy.deepcopy(domain_1x2_row), copy.deepcopy(domain_1x2_col))))
+                heapq.heappush(init_state.ships, [len(domain_1x2_row)+len(domain_1x2_col), priority_index, Ship(i+1, copy.deepcopy(domain_1x2_row), copy.deepcopy(domain_1x2_col))])
             elif (i == 2):
-                heapq.heappush(init_state.ships, (len(domain_1x3_row)+len(domain_1x3_col), priority_index, Ship(i+1, copy.deepcopy(domain_1x3_row), copy.deepcopy(domain_1x3_col))))
+                heapq.heappush(init_state.ships, [len(domain_1x3_row)+len(domain_1x3_col), priority_index, Ship(i+1, copy.deepcopy(domain_1x3_row), copy.deepcopy(domain_1x3_col))])
             else:
-                heapq.heappush(init_state.ships, (len(domain_1x4_row)+len(domain_1x4_col), priority_index, Ship(i+1, copy.deepcopy(domain_1x4_row), copy.deepcopy(domain_1x4_col))))
+                heapq.heappush(init_state.ships, [len(domain_1x4_row)+len(domain_1x4_col), priority_index, Ship(i+1, copy.deepcopy(domain_1x4_row), copy.deepcopy(domain_1x4_col))])
             priority_index += 1
     SHIP_LIMIT[0] += num_init_1x1
 
