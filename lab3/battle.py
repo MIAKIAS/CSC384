@@ -60,25 +60,8 @@ def FC(state:State, ans:list):
     for row_value in cur_ship.domain_row.copy():
         row = row_value[0]
         col = row_value[1]
-        # Check if adding the ship will exceed the row limit
-        # FIXME: 现在还是BT，需要改成FC
-        if (state.cur_row[row] + cur_ship.length > ROW_LIMIT[row]):
-            cur_ship.domain_row.remove(row_value)
-            continue
-        # Check if adding the ship will exceed the col limit
-        if (state.cur_col[col] + 1 > COL_LIMIT[col]):
-            cur_ship.domain_row.remove(row_value)
-            continue
-        if (cur_ship.length > 1 and state.cur_col[col+1] + 1 > COL_LIMIT[col+1]):
-            cur_ship.domain_row.remove(row_value)
-            continue
-        if (cur_ship.length > 2 and state.cur_col[col+2] + 1 > COL_LIMIT[col+2]):
-            cur_ship.domain_row.remove(row_value)
-            continue
-        if (cur_ship.length > 3 and state.cur_col[col+3] + 1 > COL_LIMIT[col+3]):
-            cur_ship.domain_row.remove(row_value)
-            continue
-        # Calculate the values that needs to be removed
+        
+        # Update the counts
         new_state = copy.deepcopy(state)
         new_state.cur_row[row] += cur_ship.length
         new_state.cur_col[col] += 1
@@ -88,6 +71,8 @@ def FC(state:State, ans:list):
             new_state.cur_col[col+2] += 1
         if (cur_ship.length > 3):
             new_state.cur_col[col+3] += 1
+
+        # Calculate the values that needs to be removed
         remove_set_1 = set()
         remove_set_2_row = set()
         remove_set_2_col = set()
@@ -131,6 +116,115 @@ def FC(state:State, ans:list):
                     break
                 ship[0] = len(ship[2].domain_row) * INDEX_1X1
         # If DWO, try next value
+        if (DWO):
+            continue
+
+        # Remove any unassigned ships that will exceed the sums
+        remove_row_1 = set()
+        remove_col_1 = set()
+        remove_row_2 = set()
+        remove_col_2 = set()
+        remove_row_3 = set()
+        remove_col_3 = set()
+        remove_row_4 = set()
+        remove_col_4 = set()
+        row_diff = ROW_LIMIT[row] - new_state.cur_row[row]
+        col_diff = COL_LIMIT[col] - new_state.cur_col[col]
+        col_diff2 = int()
+        col_diff3 = int()
+        col_diff4 = int()
+        if (cur_ship.length > 1):
+            col_diff2 = COL_LIMIT[col+1] - new_state.cur_col[col+1]
+            if (cur_ship.length > 2):
+                col_diff3 = COL_LIMIT[col+2] - new_state.cur_col[col+2]
+                if (cur_ship.length > 3):
+                    col_diff4 = COL_LIMIT[col+3] - new_state.cur_col[col+3]
+        if (row_diff < 4):
+            remove_row_4.add(row)
+            if (row_diff < 3):
+                remove_row_3.add(row)
+                if (row_diff < 2):
+                    remove_row_2.add(row)
+                    if (row_diff < 1):
+                        remove_row_1.add(row)
+        if (col_diff < 4):
+            remove_col_4.add(col)
+            if (col_diff < 3):
+                remove_col_3.add(col)
+                if (col_diff < 2):
+                    remove_col_2.add(col)
+                    if (col_diff < 1):
+                        remove_col_1.add(col)
+        if (cur_ship.length > 1):
+            if (col_diff2 < 4):
+                remove_col_4.add(col+1)
+                if (col_diff2 < 3):
+                    remove_col_3.add(col+1)
+                    if (col_diff2 < 2):
+                        remove_col_2.add(col+1)
+                        if (col_diff2 < 1):
+                            remove_col_1.add(col+1)
+            if (cur_ship.length > 2):
+                if (col_diff3 < 4):
+                    remove_col_4.add(col+2)
+                    if (col_diff3 < 3):
+                        remove_col_3.add(col+2)
+                        if (col_diff3 < 2):
+                            remove_col_2.add(col+2)
+                            if (col_diff3 < 1):
+                                remove_col_1.add(col+2)
+                if (cur_ship.length > 3):
+                    if (col_diff4 < 4):
+                        remove_col_4.add(col+3)
+                        if (col_diff4 < 3):
+                            remove_col_3.add(col+3)
+                            if (col_diff4 < 2):
+                                remove_col_2.add(col+3)
+                                if (col_diff4 < 1):
+                                    remove_col_1.add(col+3)
+
+        DWO = False
+        for ship in new_state.ships:
+            ship = ship[2]
+            if (ship.length == 1):
+                for value in ship.domain_row.copy():
+                    if (value[0] in remove_row_1 or value[1] in remove_col_1):
+                        ship.domain_row.remove(value)
+                        if (len(ship.domain_row) == 0):
+                            DWO = True
+                            break
+            elif (ship.length == 2):
+                for value in ship.domain_row.copy():
+                    if (value[0] in remove_row_2 or value[1] in remove_col_1 or value[1]+1 in remove_col_1):
+                        ship.domain_row.remove(value)
+                for value in ship.domain_col.copy():
+                    if (value[1] in remove_col_2 or value[0] in remove_row_1 or value[0]+1 in remove_row_1):
+                        ship.domain_col.remove(value)
+                        if (len(ship.domain_col) == 0 and len(ship.domain_row) == 0):
+                            DWO = True
+                            break
+            elif (ship.length == 3):
+                for value in ship.domain_row.copy():
+                    if (value[0] in remove_row_3 or value[1] in remove_col_1 or value[1]+1 in remove_col_1 or value[1]+2 in remove_col_1):
+                        ship.domain_row.remove(value)
+                for value in ship.domain_col.copy():
+                    if (value[1] in remove_col_3 or value[0] in remove_row_1 or value[0]+1 in remove_row_1 or value[0]+2 in remove_row_1):
+                        ship.domain_col.remove(value)
+                        if (len(ship.domain_col) == 0 and len(ship.domain_row) == 0):
+                            DWO = True
+                            break
+            elif (ship.length == 4):
+                for value in ship.domain_row.copy():
+                    if (value[0] in remove_row_4 or value[1] in remove_col_1 or value[1]+1 in remove_col_1 or value[1]+2 in remove_col_1 or value[1]+3 in remove_col_1):
+                        ship.domain_row.remove(value)
+                for value in ship.domain_col.copy():
+                    if (value[1] in remove_col_4 or value[0] in remove_row_1 or value[0]+1 in remove_row_1 or value[0]+2 in remove_row_1 or value[0]+3 in remove_row_1):
+                        ship.domain_col.remove(value)
+                        if (len(ship.domain_col) == 0 and len(ship.domain_row) == 0):
+                            DWO = True
+                            break
+            if (DWO):
+                break
         if (DWO):
             continue
 
@@ -193,25 +287,8 @@ def FC(state:State, ans:list):
         for col_value in cur_ship.domain_col.copy():
             row = col_value[0]
             col = col_value[1]
-            # Check if adding the ship will exceed the col limit
-            # FIXME: 现在还是BT，需要改成FC
-            if (state.cur_col[col] + cur_ship.length > COL_LIMIT[col]):
-                cur_ship.domain_col.remove(col_value)
-                continue
-            # Check if adding the ship will exceed the row limit
-            if (state.cur_row[row] + 1 > ROW_LIMIT[row]):
-                cur_ship.domain_col.remove(col_value)
-                continue
-            if (state.cur_row[row+1] + 1 > ROW_LIMIT[row+1]):
-                cur_ship.domain_col.remove(col_value)
-                continue
-            if (cur_ship.length > 2 and state.cur_row[row+2] + 1 > ROW_LIMIT[row+2]):
-                cur_ship.domain_col.remove(col_value)
-                continue
-            if (cur_ship.length > 3 and state.cur_row[row+3] + 1 > ROW_LIMIT[row+3]):
-                cur_ship.domain_col.remove(col_value)
-                continue
-            # Calculate the values that needs to be removed
+
+            # Update the counts
             new_state = copy.deepcopy(state)
             new_state.cur_col[col] += cur_ship.length
             new_state.cur_row[row] += 1
@@ -220,6 +297,8 @@ def FC(state:State, ans:list):
                 new_state.cur_row[row+2] += 1
             if (cur_ship.length > 3):
                 new_state.cur_row[row+3] += 1
+
+            # Calculate the values that needs to be removed
             remove_set_1 = set()
             remove_set_2_row = set()
             remove_set_2_col = set()
@@ -263,6 +342,115 @@ def FC(state:State, ans:list):
                         break
                     ship[0] = len(ship[2].domain_row) * INDEX_1X1
             # If DWO, try next value
+            if (DWO):
+                continue
+
+            # Remove any unassigned ships that will exceed the sums
+            remove_row_1 = set()
+            remove_col_1 = set()
+            remove_row_2 = set()
+            remove_col_2 = set()
+            remove_row_3 = set()
+            remove_col_3 = set()
+            remove_row_4 = set()
+            remove_col_4 = set()
+            row_diff = ROW_LIMIT[row] - new_state.cur_row[row]
+            col_diff = COL_LIMIT[col] - new_state.cur_col[col]
+            row_diff2 = int()
+            row_diff3 = int()
+            row_diff4 = int()
+            if (cur_ship.length > 1):
+                row_diff2 = ROW_LIMIT[row+1] - new_state.cur_row[row+1]
+                if (cur_ship.length > 2):
+                    row_diff3 = ROW_LIMIT[row+2] - new_state.cur_row[row+2]
+                    if (cur_ship.length > 3):
+                        row_diff4 = ROW_LIMIT[row+3] - new_state.cur_row[row+3]
+            if (col_diff < 4):
+                remove_col_4.add(col)
+                if (col_diff < 3):
+                    remove_col_3.add(col)
+                    if (col_diff < 2):
+                        remove_col_2.add(col)
+                        if (col_diff < 1):
+                            remove_col_1.add(col)
+            if (row_diff < 4):
+                remove_row_4.add(row)
+                if (row_diff < 3):
+                    remove_row_3.add(row)
+                    if (row_diff < 2):
+                        remove_row_2.add(row)
+                        if (row_diff < 1):
+                            remove_row_1.add(row)
+            if (cur_ship.length > 1):
+                if (row_diff2 < 4):
+                    remove_row_4.add(row+1)
+                    if (row_diff2 < 3):
+                        remove_row_3.add(row+1)
+                        if (row_diff2 < 2):
+                            remove_row_2.add(row+1)
+                            if (row_diff2 < 1):
+                                remove_row_1.add(row+1)
+                if (cur_ship.length > 2):
+                    if (row_diff3 < 4):
+                        remove_row_4.add(row+2)
+                        if (row_diff3 < 3):
+                            remove_row_3.add(row+2)
+                            if (row_diff3 < 2):
+                                remove_row_2.add(row+2)
+                                if (row_diff3 < 1):
+                                    remove_row_1.add(row+2)
+                    if (cur_ship.length > 3):
+                        if (row_diff4 < 4):
+                            remove_row_4.add(row+3)
+                            if (row_diff4 < 3):
+                                remove_row_3.add(row+3)
+                                if (row_diff4 < 2):
+                                    remove_row_2.add(row+3)
+                                    if (row_diff4 < 1):
+                                        remove_row_1.add(row+3)
+
+            DWO = False
+            for ship in new_state.ships:
+                ship = ship[2]
+                if (ship.length == 1):
+                    for value in ship.domain_row.copy():
+                        if (value[0] in remove_row_1 or value[1] in remove_col_1):
+                            ship.domain_row.remove(value)
+                            if (len(ship.domain_row) == 0):
+                                DWO = True
+                                break
+                elif (ship.length == 2):
+                    for value in ship.domain_row.copy():
+                        if (value[0] in remove_row_2 or value[1] in remove_col_1 or value[1]+1 in remove_col_1):
+                            ship.domain_row.remove(value)
+                    for value in ship.domain_col.copy():
+                        if (value[1] in remove_col_2 or value[0] in remove_row_1 or value[0]+1 in remove_row_1):
+                            ship.domain_col.remove(value)
+                            if (len(ship.domain_col) == 0 and len(ship.domain_row) == 0):
+                                DWO = True
+                                break
+                elif (ship.length == 3):
+                    for value in ship.domain_row.copy():
+                        if (value[0] in remove_row_3 or value[1] in remove_col_1 or value[1]+1 in remove_col_1 or value[1]+2 in remove_col_1):
+                            ship.domain_row.remove(value)
+                    for value in ship.domain_col.copy():
+                        if (value[1] in remove_col_3 or value[0] in remove_row_1 or value[0]+1 in remove_row_1 or value[0]+2 in remove_row_1):
+                            ship.domain_col.remove(value)
+                            if (len(ship.domain_col) == 0 and len(ship.domain_row) == 0):
+                                DWO = True
+                                break
+                elif (ship.length == 4):
+                    for value in ship.domain_row.copy():
+                        if (value[0] in remove_row_4 or value[1] in remove_col_1 or value[1]+1 in remove_col_1 or value[1]+2 in remove_col_1 or value[1]+3 in remove_col_1):
+                            ship.domain_row.remove(value)
+                    for value in ship.domain_col.copy():
+                        if (value[1] in remove_col_4 or value[0] in remove_row_1 or value[0]+1 in remove_row_1 or value[0]+2 in remove_row_1 or value[0]+3 in remove_row_1):
+                            ship.domain_col.remove(value)
+                            if (len(ship.domain_col) == 0 and len(ship.domain_row) == 0):
+                                DWO = True
+                                break
+                if (DWO):
+                    break
             if (DWO):
                 continue
 
@@ -387,8 +575,8 @@ if __name__ == "__main__":
     # Read in the input/output file names
     __, input_file, output_file = argv
 
-    # input_file = "/h/u17/c1/00/wangw222/csc384/lab3/battle_validate/9.txt"
-    # output_file = "/h/u17/c1/00/wangw222/csc384/lab3/9out.txt"
+    # input_file = "/h/u17/c1/00/wangw222/csc384/lab3/battle_validate/0.txt"
+    # output_file = "/h/u17/c1/00/wangw222/csc384/lab3/0out.txt"
 
     grid = list()
     with open(input_file, 'r', encoding='utf-8') as f:

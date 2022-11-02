@@ -32,7 +32,7 @@ if __name__ == '__main__':
                              f"Expected <{output_lines[index].strip()}> "
                              f"Encountered <{solution_lines[index].strip()}>\n")
       passed = False
-      exit(1)
+      sys.exit(1)
 
   if passed:
     print("Battleship output matches solution file.\n")
