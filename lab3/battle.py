@@ -2,7 +2,7 @@
     Fall 2022 - CSC384 - Lab3
     Author: Weizhou Wang
     Student#: 1004421262
-    Usage: 6.7s all testcases
+    Usage: python3 ./battle.py <input.txt> <output.txt>
 '''
 from sys import argv
 import heapq
